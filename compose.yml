@@ -20,6 +20,21 @@ services:
       - pgadmin_data:/var/lib/pgadmin
     depends_on:
       - database_postgres
+  
+  app:
+    build: .
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./src
+          target: /app/src
+    depends_on:
+      - database_postgres
 
 volumes:
   postgres_data:
