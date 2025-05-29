@@ -112,10 +112,4 @@ Após a validação bem-sucedida pela CI, o CD se encarrega de levar a aplicaç�
 4.  Implantação em Produção (Implantação Contínua - se for o caso): 🚀 Se o projeto estiver configurado para Implantação Contínua, a implantação em produção acontece automaticamente assim que todas as etapas e testes anteriores forem concluídos com sucesso, sem intervenção humana. O sistema antifraude está agora ativo para os clientes!
 5.  Monitoramento: 👀 Uma vez em produção, a aplicação é continuamente monitorada para garantir seu funcionamento ideal, desempenho e para detectar rapidamente quaisquer anomalias ou problemas.
 
-Em resumo, o CI/CD para o "AntiFraudSystem" significa:
-
-* Agilidade: Novas funcionalidades e melhorias na detecção de fraudes são entregues rapidamente aos usuários. ⚡
-* Confiabilidade: Cada nova versão é rigorosamente testada em ambientes consistentes (graças ao Docker), minimizando erros. ✅
-* Redução de Riscos: Problemas são identificados e corrigidos precocemente no ciclo de desenvolvimento, evitando problemas sérios em produção. 📉
-
 Tudo isso contribui para um sistema de detecção de fraudes robusto, eficiente e sempre atualizado, protegendo as transações bancárias de forma contínua! 💖
