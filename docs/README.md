@@ -26,7 +26,7 @@ requests/: Esta pasta é para requisições HTTP de teste, frequentemente usadas
 └── users/: Subpasta para organizar requisições relacionadas especificamente a usuários.
 └── users.http: Um arquivo contendo exemplos de requisições HTTP para os endpoints da API de usuários.
 
-## 2. Pasta src (Onde o Código-Fonte Reside)
+### 2. Pasta src (Onde o Código-Fonte Reside)
 A pasta src é o coração do projeto, contendo todo o código-fonte da aplicação e seus respectivos testes. Ela é dividida logicamente em main (código da aplicação) e test (código dos testes).
 
 ### 2.1. src/main (Código Principal da Aplicação)
