@@ -11,7 +11,8 @@ public class InfoService {
 
     @Value("${spring.application.name:AntiFraud System}")
     private String appName;
-    @Value("${spring.application.version:unknown}")
+
+    @Value("${spring.application.version:Unknown}")
     private String version;
 
     public InfoDTO getAllinfo() {
