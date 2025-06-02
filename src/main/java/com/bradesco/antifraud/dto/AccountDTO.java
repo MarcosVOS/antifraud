@@ -2,6 +2,7 @@ package com.bradesco.antifraud.dto;
 
 import com.bradesco.antifraud.model.Account;
 import com.bradesco.antifraud.model.Customer;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.*;
 import lombok.Builder;
 import lombok.Data;
@@ -12,9 +13,10 @@ import java.util.UUID;
 @Builder
 public class AccountDTO {
 
-   @NotNull
+
+
     private UUID id;
-    @NotBlank
+    @NotNull
     private String accountNumber;
     @NotBlank(message = "Agency cannot be blank")
     private String agency;
