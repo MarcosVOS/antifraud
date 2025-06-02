@@ -1,7 +1,6 @@
 package com.bradesco.antifraud.dto;
 
 import lombok.AllArgsConstructor;
-
 import lombok.Data;
 
 @AllArgsConstructor
