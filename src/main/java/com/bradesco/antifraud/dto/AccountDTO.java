@@ -12,7 +12,7 @@ import java.util.UUID;
 @Builder
 public class AccountDTO {
 
-    @NotBlank(message = "ID cannot be blank")
+   @NotNull
     private UUID id;
     @NotBlank
     private String accountNumber;

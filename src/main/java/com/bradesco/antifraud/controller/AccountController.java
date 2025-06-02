@@ -3,14 +3,17 @@ package com.bradesco.antifraud.controller;
 import com.bradesco.antifraud.dto.AccountDTO;
 
 import com.bradesco.antifraud.mapper.AccountMapper;
+import com.bradesco.antifraud.model.Account;
 import com.bradesco.antifraud.service.AccountService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+
+
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
 import java.util.UUID;
 
 @RestController
@@ -18,11 +21,9 @@ import java.util.UUID;
 @RequiredArgsConstructor
 class AccountController {
 
-   @Autowired
+
     private final AccountService accountService;
 
-
-   @Autowired
     private final AccountMapper accountMapper;
 
     @GetMapping("/{id}")
@@ -31,6 +32,24 @@ public ResponseEntity<AccountDTO> getAccountByID(@PathVariable String id) {
             .map(accountMapper::toDTO)
             .map(ResponseEntity::ok)
             .orElseGet(() -> ResponseEntity.notFound().build());
+}
+
+    @PostMapping("/newaccount")
+
+public ResponseEntity<AccountDTO> createAccount(@RequestBody @Valid AccountDTO accountDTO) {
+        Account accountEntity = accountMapper.toEntity(accountDTO);
+        Account createdAccount = accountService.createAccount(accountEntity);
+        AccountDTO createdAccountDTO = accountMapper.toDTO(createdAccount);
+
+
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequestUri()
+                .path("/newaccount")
+                .buildAndExpand(createdAccountDTO.getId())
+                .toUri();
+
+
+        return ResponseEntity.created(location).body(createdAccountDTO);
 }
 
 }

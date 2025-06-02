@@ -21,4 +21,24 @@ public class AccountService {
 
          return  accountRepository.findById(id);
      }
+
+    public Account createAccount(Account newAccount) {
+
+        return accountRepository.save(newAccount);
+    }
+    public void deleteAccount(UUID id) {
+        accountRepository.deleteById(id);
+    }
+    public Account updateAccount(UUID id, Account updatedAccount) {
+        if (!accountRepository.existsById(id)) {
+            throw new IllegalArgumentException("Account with ID " + id + " does not exist.");
+        }
+        updatedAccount.setId(id);
+        return accountRepository.save(updatedAccount);
+    }
+    public boolean accountExists(UUID id) {
+        return accountRepository.existsById(id);
+    }
+
+
 }
