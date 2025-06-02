@@ -47,7 +47,7 @@ public class Account {
 
     @ManyToOne(fetch =  FetchType.LAZY)
     @JoinColumn(name = "customer_id", nullable = false)
-    Customer customer;
+    Customer customerId;
 
     public enum AccountType {CORRENTE, POUPANCA, INVESTIMENTO}
     public enum AccountStatus {ATIVA, INATIVA, BLOQUADA, ENCERRADA}
