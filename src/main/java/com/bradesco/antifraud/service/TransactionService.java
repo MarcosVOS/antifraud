@@ -23,7 +23,7 @@ public class TransactionService {
     }
 
     public Transaction create(Transaction transaction){
-        validacao(transaction);
+        validate(transaction);
         return repository.save(transaction);
     }
     
@@ -31,18 +31,18 @@ public class TransactionService {
         return repository.findById(id);
     }
 
-    public Transaction update(UUID id, Transaction nova){
+    public Transaction update(UUID id, Transaction updated){
         if(!repository.existsById(id)){
-            throw new EntityNotFoundException("A transação não foi encontrada");
+            throw new EntityNotFoundException("Transaction not found");
         }
-        validacao(nova);
-        nova.setId(id);
-        return repository.save(nova);
+        validate(updated);
+        updated.setId(id);
+        return repository.save(updated);
     }
 
     public void delete(UUID id){
         if (!repository.existsById(id)) {
-            throw new EntityNotFoundException("Transação solicitada não encontrada");
+            throw new EntityNotFoundException("Requested transaction not found");
         }
         repository.deleteById(id);
     }
@@ -51,40 +51,40 @@ public class TransactionService {
         return (ArrayList<Transaction>) repository.findAll();
     }
 
-    private void validacao(Transaction transaction){
-        boolean contaOrigem = transaction.getContaDeOrigem() != null;
-        boolean contaDestino = transaction.getContaDeDestino() != null;
-        Transaction.TransactionType tipo = transaction.getTipo();
+    private void validate(Transaction transaction){
+        boolean hasSourceAccount = transaction.getContaDeOrigem() != null;
+        boolean hasDestinationAccount = transaction.getContaDeDestino() != null;
+        Transaction.TransactionType type = transaction.getTipo();
     
-
-        if (tipo == Transaction.TransactionType.DEPOSITO) {
-            if (contaOrigem) {
-                throw conflito("Sem conta de origem para DEPOSITO.");
+        if (type == Transaction.TransactionType.DEPOSITO) {
+            if (hasSourceAccount) {
+                throw conflict("Deposit should not have a source account.");
             }
-            if (!contaDestino) {
-                throw conflito("Deve ter conta de destino para DEPOSITO.");
+            if (!hasDestinationAccount) {
+                throw conflict("Deposit must have a destination account.");
             }
         }
-        else if (tipo == Transaction.TransactionType.SAQUE) {
-            if (!contaOrigem) {
-                throw conflito("Deve ter uma conta de origem para SAQUE.");
+        else if (type == Transaction.TransactionType.SAQUE) {
+            if (!hasSourceAccount) {
+                throw conflict("Withdrawal must have a source account.");
             }
-            if (contaDestino) {
-                throw conflito("Sem conta de destino para SAQUE.");
+            if (hasDestinationAccount) {
+                throw conflict("Withdrawal should not have a destination account.");
             }
         }    
-        else if (tipo == Transaction.TransactionType.TRANSFERENCIA) {
-            if (!contaOrigem || !contaDestino) {
-                throw conflito("Deve ter conta de origem e de destino para TRANSFERENCIA.");
+        else if (type == Transaction.TransactionType.TRANSFERENCIA) {
+            if (!hasSourceAccount || !hasDestinationAccount) {
+                throw conflict("Transfer must have both source and destination accounts.");
             }
         }
-        else if (tipo == Transaction.TransactionType.PAGAMENTO) {
-            if (!contaOrigem) {
-                throw conflito("Deve ter conta de origem para PAGAMENTO.");
+        else if (type == Transaction.TransactionType.PAGAMENTO) {
+            if (!hasSourceAccount) {
+                throw conflict("Payment must have a source account.");
             }
         }         
     }
-    private ResponseStatusException conflito(String msg){
+
+    private ResponseStatusException conflict(String msg){
         return new ResponseStatusException(HttpStatus.CONFLICT, msg);
     }
 }
