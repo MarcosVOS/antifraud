@@ -36,7 +36,7 @@ public class Account {
     @NotNull
     private BigDecimal balance;
 
-    //Verificar quanto ao funcionamento do ENumType.STRING nessa situação
+
     @NotBlank
     @Enumerated(EnumType.STRING)
     private AccountType accountType;
@@ -47,7 +47,7 @@ public class Account {
 
     @ManyToOne(fetch =  FetchType.LAZY)
     @JoinColumn(name = "customer_id", nullable = false)
-    Customer customerId;
+    Customer customer;
 
     public enum AccountType {CORRENTE, POUPANCA, INVESTIMENTO}
     public enum AccountStatus {ATIVA, INATIVA, BLOQUADA, ENCERRADA}

@@ -1,8 +1,6 @@
 package com.bradesco.antifraud.dto;
 
 import com.bradesco.antifraud.model.Account;
-import com.bradesco.antifraud.model.Customer;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.*;
 import lombok.Builder;
 import lombok.Data;
@@ -26,7 +24,7 @@ public class AccountDTO {
     private Account.AccountType accountType;
     @NotNull(message = "Account status cannot be null")
     private Account.AccountStatus accountStatus;
-    //@NotNull(message = "Customer cannot be null")
-    private Customer customerId;
+    @NotNull(message = "Customer ID cannot be null")
+    private UUID customerId;
 
 }

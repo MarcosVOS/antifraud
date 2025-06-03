@@ -8,6 +8,8 @@ import com.bradesco.antifraud.model.Account;
 import com.bradesco.antifraud.model.Account.AccountStatus;
 import com.bradesco.antifraud.model.Account.AccountType;
 
+import com.bradesco.antifraud.model.Address;
+import com.bradesco.antifraud.model.Customer;
 import com.bradesco.antifraud.service.AccountService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -20,6 +22,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import java.math.BigDecimal;
 
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -43,6 +46,29 @@ class AccountControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    UUID generatedId = UUID.randomUUID();
+    UUID customerId = UUID.randomUUID();
+    private Customer createMockCustomer(UUID customerId) {
+        Address address = Address.builder()
+                .street("Main St")
+                .number("123")
+                .neighborhood("Downtown")
+                .city("Anytown")
+                .state("XX")
+                .zipCode("12345-678")
+                .build();
+
+        return Customer.builder()
+                .id(customerId)
+                .name("John Doe")
+                .cpf("12345678909") // Use a valid CPF generator for real tests if needed
+                .dateOfBirth(LocalDate.of(1990, 1, 1))
+                .email("john.doe@example.com") // Valid email
+                .phone("+5511999998888")
+                .address(address)
+                .password("securePassword123")
+                .build();
+    }
 
     @Test
     void getAccountByID_found_returnsOk() throws Exception {
@@ -55,7 +81,7 @@ class AccountControllerTest {
                 .balance(BigDecimal.TEN)
                 .accountType(AccountType.CORRENTE)
                 .accountStatus(AccountStatus.ATIVA)
-                .customerId(null)
+                .customer(createMockCustomer(customerId))
                 .build();
         AccountDTO dto = AccountDTO.builder()
                 .id(id)
@@ -64,14 +90,14 @@ class AccountControllerTest {
                 .balance(BigDecimal.TEN)
                 .accountType(Account.AccountType.CORRENTE)
                 .accountStatus(Account.AccountStatus.ATIVA)
-                .customerId(null)
+                .customerId(customerId)
                 .build();
 
         Mockito.when(accountService.getAccountById(id)).thenReturn(Optional.of(account));
         Mockito.when(accountMapper.toDTO(account)).thenReturn(dto);
 
 
-        mockMvc.perform(get("/accounts/"))
+        mockMvc.perform(get("/accounts/"+ id))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(id.toString()))
                 .andExpect(jsonPath("$.accountNumber").value("12345"))
@@ -92,25 +118,24 @@ class AccountControllerTest {
 
     @Test
     void createAccount_returnsCreated() throws Exception {
-        UUID generatedId = UUID.randomUUID();
+
+        // Mockando um ID de cliente, se necessário
         AccountDTO requestDto = AccountDTO.builder()
-                .id(generatedId)
                 .accountNumber("67890")
                 .agency("002")
                 .balance(new BigDecimal("100.50"))
                 .accountType(AccountType.POUPANCA)
                 .accountStatus(AccountStatus.ATIVA)
-                .customerId(null) // Supondo que customerId pode ser nulo ou você pode mockar um Customer
+                .customerId(createMockCustomer(customerId).getId()) // Supondo que customerId pode ser nulo ou você pode mockar um Customer
                 .build();
 
         Account accountEntityToCreate = Account.builder()
-                .id(generatedId)
                 .accountNumber("67890")
                 .agency("002")
                 .balance(new BigDecimal("100.50"))
                 .accountType(AccountType.POUPANCA)
                 .accountStatus(AccountStatus.ATIVA)
-                .customerId(null)
+                .customer(createMockCustomer(customerId))
                 .build();
 
         Account createdAccountEntity = Account.builder()
@@ -120,7 +145,7 @@ class AccountControllerTest {
                 .balance(new BigDecimal("100.50"))
                 .accountType(AccountType.POUPANCA)
                 .accountStatus(AccountStatus.ATIVA)
-                .customerId(null)
+                .customer(createMockCustomer(customerId))
                 .build();
 
         AccountDTO responseDto = AccountDTO.builder()
@@ -130,7 +155,7 @@ class AccountControllerTest {
                 .balance(new BigDecimal("100.50"))
                 .accountType(AccountType.POUPANCA)
                 .accountStatus(AccountStatus.ATIVA)
-                .customerId(null)
+                .customerId(createMockCustomer(generatedId).getId())
                 .build();
 
         Mockito.when(accountMapper.toEntity(any(AccountDTO.class))).thenReturn(accountEntityToCreate);

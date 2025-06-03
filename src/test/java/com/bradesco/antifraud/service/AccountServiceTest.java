@@ -44,7 +44,7 @@ class AccountServiceTest {
                 .balance(BigDecimal.TEN)
                 .accountType(Account.AccountType.CORRENTE)
                 .accountStatus(Account.AccountStatus.ATIVA)
-                .customerId(customer) // Supondo que Account tenha um campo Customer
+                .customer(customer) // Supondo que Account tenha um campo Customer
                 .build();
     }
 
@@ -77,7 +77,7 @@ class AccountServiceTest {
                 .balance(new BigDecimal("200.00"))
                 .accountType(Account.AccountType.POUPANCA)
                 .accountStatus(Account.AccountStatus.ATIVA)
-                .customerId(customer)
+                .customer(customer)
                 .build();
         // O ID será gerado pelo banco de dados, então o mock retorna com ID
         Account savedAccount = Account.builder()
@@ -87,7 +87,7 @@ class AccountServiceTest {
                 .balance(new BigDecimal("200.00"))
                 .accountType(Account.AccountType.POUPANCA)
                 .accountStatus(Account.AccountStatus.ATIVA)
-                .customerId(customer)
+                .customer(customer)
                 .build();
 
         when(accountRepository.save(newAccount)).thenReturn(savedAccount);
@@ -116,7 +116,7 @@ class AccountServiceTest {
                 .balance(BigDecimal.ONE)
                 .accountType(Account.AccountType.POUPANCA)
                 .accountStatus(Account.AccountStatus.ATIVA)
-                .customerId(customer)
+                .customer(customer)
                 .build(); // ID não é necessário aqui, será setado pelo serviço
 
         Account expectedUpdatedAccount = Account.builder()
@@ -126,7 +126,7 @@ class AccountServiceTest {
                 .balance(BigDecimal.ONE)
                 .accountType(Account.AccountType.POUPANCA)
                 .accountStatus(Account.AccountStatus.ATIVA)
-                .customerId(customer)
+                .customer(customer)
                 .build();
 
         when(accountRepository.existsById(accountId)).thenReturn(true);
