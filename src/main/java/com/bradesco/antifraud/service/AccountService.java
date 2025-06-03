@@ -4,8 +4,6 @@ package com.bradesco.antifraud.service;
 import com.bradesco.antifraud.exception.accountExceptions.AccountAlreadyExistsException;
 import com.bradesco.antifraud.model.Account;
 import com.bradesco.antifraud.repository.AccountRepository;
-import com.bradesco.antifraud.repository.CustomerRepository;
-
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 
