@@ -27,6 +27,9 @@ public class AccountService {
         return accountRepository.save(newAccount);
     }
     public void deleteAccount(UUID id) {
+        if (!accountRepository.existsById(id)) {
+            throw new IllegalArgumentException("Account with ID " + id + " does not exist.");
+        }
         accountRepository.deleteById(id);
     }
     public Account updateAccount(UUID id, Account updatedAccount) {
