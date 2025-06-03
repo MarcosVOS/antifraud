@@ -151,7 +151,7 @@ class AccountServiceTest {
 
         // Act
         // O parâmetro this.customerId é passado, mas o método createAccount atual não o utiliza.
-        Account actualSavedAccount = accountService.createAccount(accountDetailsToCreate, createMockCustomer(customerId).getId());
+        Account actualSavedAccount = accountService.createAccount(accountDetailsToCreate);
 
         // Assert
         assertNotNull(actualSavedAccount, "A conta salva não deve ser nula.");
@@ -193,7 +193,7 @@ class AccountServiceTest {
 
         // Act & Assert
         AccountAlreadyExistsException exception = assertThrows(AccountAlreadyExistsException.class, () -> {
-            accountService.createAccount(accountAttemptingToCreate, createMockCustomer(customerId).getId());
+            accountService.createAccount(accountAttemptingToCreate);
         });
 
         // Verifica a mensagem da exceção (baseada na implementação atual do serviço)
