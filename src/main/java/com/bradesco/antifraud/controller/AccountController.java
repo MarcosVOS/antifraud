@@ -33,23 +33,47 @@ public ResponseEntity<AccountDTO> getAccountByID(@PathVariable String id) {
             .map(ResponseEntity::ok)
             .orElseGet(() -> ResponseEntity.notFound().build());
 }
-
+    //Create a new Account
     @PostMapping("/newaccount")
-
 public ResponseEntity<AccountDTO> createAccount(@RequestBody @Valid AccountDTO accountDTO) {
+        
         Account accountEntity = accountMapper.toEntity(accountDTO);
-        Account createdAccount = accountService.createAccount(accountEntity);
+
+        Account createdAccount = accountService.createAccount(accountEntity, accountDTO.getCustomerId());
         AccountDTO createdAccountDTO = accountMapper.toDTO(createdAccount);
 
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequestUri()
-                .path("/newaccount")
+                .path("/{id}")
                 .buildAndExpand(createdAccountDTO.getId())
                 .toUri();
 
-
         return ResponseEntity.created(location).body(createdAccountDTO);
 }
+    //Delete an Account
+    @DeleteMapping("/deleteAccount/{id}")
+public ResponseEntity<Void> deleteAccount(@PathVariable String id) {
+    UUID accountId = UUID.fromString(id);
+    if (!accountService.accountExists(accountId)) {
+        return ResponseEntity.notFound().build();
+    }
+    accountService.deleteAccount(accountId);
+    return ResponseEntity.noContent().build();
+}
 
+    //Update an account
+    @PutMapping("/updateAccount/{id}")
+public ResponseEntity<AccountDTO> updateAccount(@PathVariable String id, @RequestBody @Valid AccountDTO accountDTO) {
+    UUID accountId = UUID.fromString(id);
+    if (!accountService.accountExists(accountId)) {
+        return ResponseEntity.notFound().build();
+    }
+    Account accountEntity = accountMapper.toEntity(accountDTO);
+    accountEntity.setId(accountId);
+    Account updatedAccount = accountService.updateAccount(accountId, accountEntity);
+    AccountDTO updatedAccountDTO = accountMapper.toDTO(updatedAccount);
+    
+    return ResponseEntity.ok(updatedAccountDTO);
+}
 }
