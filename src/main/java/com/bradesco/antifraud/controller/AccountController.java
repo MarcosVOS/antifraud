@@ -39,7 +39,7 @@ public ResponseEntity<AccountDTO> createAccount(@RequestBody @Valid AccountDTO a
         
         Account accountEntity = accountMapper.toEntity(accountDTO);
 
-        Account createdAccount = accountService.createAccount(accountEntity, accountDTO.getCustomerId());
+        Account createdAccount = accountService.createAccount(accountEntity);
         AccountDTO createdAccountDTO = accountMapper.toDTO(createdAccount);
 
 

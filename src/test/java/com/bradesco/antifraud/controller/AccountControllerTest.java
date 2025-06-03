@@ -159,7 +159,7 @@ class AccountControllerTest {
                 .build();
 
         Mockito.when(accountMapper.toEntity(any(AccountDTO.class))).thenReturn(accountEntityToCreate);
-        Mockito.when(accountService.createAccount(any(Account.class), customerId)).thenReturn(createdAccountEntity);
+        Mockito.when(accountService.createAccount(any(Account.class))).thenReturn(createdAccountEntity);
         Mockito.when(accountMapper.toDTO(any(Account.class))).thenReturn(responseDto);
 
         mockMvc.perform(post("/accounts/newaccount")
