@@ -23,24 +23,30 @@ public class TransactionService {
     }
 
     public Transaction create(Transaction transaction){
+        validacao(transaction);
         return repository.save(transaction);
     }
+    
     public Optional<Transaction> findById(UUID id){
         return repository.findById(id);
     }
 
     public Transaction update(UUID id, Transaction nova){
         if(!repository.existsById(id)){
-            return null;
+            throw new EntityNotFoundException("A transação não foi encontrada");
         }
+        validacao(nova);
+        nova.setId(id);
         return repository.save(nova);
     }
+
     public void delete(UUID id){
         if (!repository.existsById(id)) {
-            throw new EntityNotFoundException("Trasação solicitada não encontrada");
+            throw new EntityNotFoundException("Transação solicitada não encontrada");
         }
         repository.deleteById(id);
     }
+
     public ArrayList<Transaction> findAll(){
         return (ArrayList<Transaction>) repository.findAll();
     }
@@ -53,28 +59,28 @@ public class TransactionService {
 
         if (tipo == Transaction.TransactionType.DEPOSITO) {
             if (contaOrigem) {
-                throw conflito("Sem conta de origem.");
+                throw conflito("Sem conta de origem para DEPOSITO.");
             }
             if (!contaDestino) {
-                throw conflito("Deve ter conta de destino.");
+                throw conflito("Deve ter conta de destino para DEPOSITO.");
             }
         }
         else if (tipo == Transaction.TransactionType.SAQUE) {
             if (!contaOrigem) {
-                throw conflito("Deve ter uma conta de origem.");
+                throw conflito("Deve ter uma conta de origem para SAQUE.");
             }
             if (contaDestino) {
-                throw conflito("Sem conta de destino.");
+                throw conflito("Sem conta de destino para SAQUE.");
             }
         }    
         else if (tipo == Transaction.TransactionType.TRANSFERENCIA) {
-            if (!contaOrigem && contaDestino) {
-                throw conflito("Deve ter conta de origem e de destino.");
+            if (!contaOrigem || !contaDestino) {
+                throw conflito("Deve ter conta de origem e de destino para TRANSFERENCIA.");
             }
         }
         else if (tipo == Transaction.TransactionType.PAGAMENTO) {
-            if (!contaOrigem&&contaDestino) {
-                throw conflito("Deve ter conta de origem e destino");
+            if (!contaOrigem) {
+                throw conflito("Deve ter conta de origem para PAGAMENTO.");
             }
         }         
     }

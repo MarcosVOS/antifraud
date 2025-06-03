@@ -5,6 +5,9 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotNull;
@@ -13,6 +16,7 @@ import jakarta.validation.constraints.NotNull;
 public class Transaction {
     
     @Id
+    @GeneratedValue
     private UUID id;
     
     public enum TransactionType{
@@ -23,6 +27,7 @@ public class Transaction {
     }
 
     @NotNull
+    @Enumerated(EnumType.STRING)
     private TransactionType tipo;
     @NotNull
     private BigDecimal valor;

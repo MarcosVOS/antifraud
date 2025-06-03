@@ -38,9 +38,13 @@ public class TransactionController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<Transaction>> findById(@PathVariable UUID id){
+    public ResponseEntity<Transaction> findById(@PathVariable UUID id){
         Optional<Transaction> transaction = service.findById(id);
-        return ResponseEntity.ok(transaction);
+        if (transaction.isPresent()) {
+            return ResponseEntity.ok(transaction.get());
+        }else{
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PutMapping("/{id}")
@@ -50,7 +54,8 @@ public class TransactionController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity delete(@PathVariable UUID id){
+    public ResponseEntity<Void> delete(@PathVariable UUID id){
+        service.delete(id);
         return ResponseEntity.noContent().build();
     }
 
@@ -58,6 +63,4 @@ public class TransactionController {
     public ResponseEntity<ArrayList<Transaction>> findAll(){
         return ResponseEntity.ok(service.findAll());
     }
-
-    
 }
