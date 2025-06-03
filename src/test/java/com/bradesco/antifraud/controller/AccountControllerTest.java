@@ -126,7 +126,7 @@ class AccountControllerTest {
                 .balance(new BigDecimal("100.50"))
                 .accountType(AccountType.POUPANCA)
                 .accountStatus(AccountStatus.ATIVA)
-                .customerId(createMockCustomer(customerId).getId()) // Supondo que customerId pode ser nulo ou você pode mockar um Customer
+                .customerId(createMockCustomer(customerId).getId())
                 .build();
 
         Account accountEntityToCreate = Account.builder()
@@ -159,14 +159,14 @@ class AccountControllerTest {
                 .build();
 
         Mockito.when(accountMapper.toEntity(any(AccountDTO.class))).thenReturn(accountEntityToCreate);
-        Mockito.when(accountService.createAccount(any(Account.class))).thenReturn(createdAccountEntity);
+        Mockito.when(accountService.createAccount(any(Account.class), customerId)).thenReturn(createdAccountEntity);
         Mockito.when(accountMapper.toDTO(any(Account.class))).thenReturn(responseDto);
 
         mockMvc.perform(post("/accounts/newaccount")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDto)))
                 .andExpect(status().isCreated())
-                .andExpect(header().string("Location", endsWith("/accounts/newaccount/newaccount")))
+                .andExpect(header().string("Location", endsWith("/accounts/newaccount/"+generatedId)))
                 .andExpect(jsonPath("$.id").value(generatedId.toString()))
                 .andExpect(jsonPath("$.accountNumber").value("67890"))
                 .andExpect(jsonPath("$.agency").value("002"))
