@@ -199,6 +199,7 @@ class AccountServiceTest {
         // Verifica a mensagem da exceção (baseada na implementação atual do serviço)
         assertEquals("Account with Id null already exists.", exception.getMessage());
 
+
         // Verify
         verify(accountRepository).findByAccountNumber(existingAccountNumber);
         verify(accountRepository, never()).save(any(Account.class)); // Garante que save não foi chamado
