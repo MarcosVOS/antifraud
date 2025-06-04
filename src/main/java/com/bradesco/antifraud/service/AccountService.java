@@ -1,6 +1,5 @@
 package com.bradesco.antifraud.service;
 
-
 import com.bradesco.antifraud.exception.accountExceptions.AccountAlreadyExistsException;
 import com.bradesco.antifraud.model.Account;
 import com.bradesco.antifraud.repository.AccountRepository;
