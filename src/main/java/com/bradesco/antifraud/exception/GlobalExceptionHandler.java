@@ -1,5 +1,6 @@
 package com.bradesco.antifraud.exception;
 
+import com.bradesco.antifraud.exception.accountExceptions.AccountAlreadyExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,17 +26,20 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(DuplicateResourceException.class)
-    public ResponseEntity<Object> handleDuplicateResource(DuplicateResourceException ex) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.CONFLICT.value());
-        body.put("error", "Conflict");
-        body.put("message", ex.getMessage());
+@ExceptionHandler(MethodArgumentNotValidException.class)
+public ResponseEntity<Object> handleValidationErrors(MethodArgumentNotValidException ex) {
+    Map<String, Object> body = new HashMap<>();
+    body.put("timestamp", LocalDateTime.now());
+    body.put("status", HttpStatus.BAD_REQUEST.value());
+    body.put("error", "Validation Failed");
 
-        return new ResponseEntity<>(body, HttpStatus.CONFLICT);
-    }
+    Map<String, String> errors = new HashMap<>();
+    ex.getBindingResult().getFieldErrors().forEach(error ->
+            errors.put(error.getField(), error.getDefaultMessage()));
+    body.put("messages", errors);
 
+    return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+}
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleValidationErrors(MethodArgumentNotValidException ex) {
         Map<String, Object> body = new HashMap<>();
@@ -50,4 +54,5 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
+
 }
