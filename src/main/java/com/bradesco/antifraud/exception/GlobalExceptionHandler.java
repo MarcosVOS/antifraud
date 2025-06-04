@@ -1,5 +1,6 @@
 package com.bradesco.antifraud.exception;
 
+import com.bradesco.antifraud.exception.accountExceptions.AccountAlreadyExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,4 +23,20 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
+
+         @ExceptionHandler(AccountAlreadyExistsException.class)
+    public ResponseEntity<Object>AccountAlreadyExists(AccountAlreadyExistsException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.CONFLICT.value());
+        body.put("error", "Conflict");
+        body.put("message", "Account already exists");
+        body.put("details", ex.getMessage());
+
+        return new ResponseEntity<>(body, HttpStatus.CONFLICT);
+    }
+
+
+   
+    
 }

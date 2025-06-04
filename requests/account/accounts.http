@@ -1,0 +1,52 @@
+### GET request to example server
+GET https://examples.http-client.intellij.net/get
+    ?generated-in=IntelliJ IDEA
+
+### Request to get an account by ID
+GET http://localhost:8080/accounts/{id}
+###Output: 200 OK
+#{
+    "id": "uuid-da-conta",
+    "numeroConta": "123456",
+    "agencia": "0001",
+    "saldo": 1000.00,
+    "tipoConta": "CORRENTE",
+    "status": "ATIVA",
+    "customerId": "uuid-do-usuario"
+    }
+### Request to create a new account
+POST http://localhost:8080/accounts/newaccount
+Content-Type: application/json
+
+{
+  "numeroConta": "123456",
+  "agencia": "0001",
+  "saldo": 1000.00,
+  "tipoConta": "CORRENTE",
+  "status": "ATIVA",
+  "customerId": "uuid-do-usuario"
+}
+###Output: 201 Created
+#{
+  "id": "uuid-da-conta-criada",
+  "numeroConta": "123456",
+  "agencia": "0001",
+  "saldo": 1000.00,
+  "tipoConta": "CORRENTE",
+  "status": "ATIVA",
+  "customerId": "uuid-do-usuario"
+  }
+
+### Request to update an account by ID
+PUT http://localhost:8080/accounts/updateAccount/{id}
+Content-Type: application/json
+{
+  "numeroConta": "123456",
+  "agencia": "0001",
+  "saldo": 1500.00,
+  "tipoConta": "POUPANCA",
+  "status": "ATIVA",
+  "customerId": "uuid-do-usuario"
+}
+### Request to delete an account by ID
+DELETE http://localhost:8080/accounts/deleteAccount/{id}
