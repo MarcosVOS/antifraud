@@ -28,4 +28,10 @@ public class CustomerController {
         Customer created = customerService.create(customer);
         return ResponseEntity.status(201).body(created);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Customer> updateCustomer(@PathVariable UUID id, @RequestBody @Valid Customer customer) {
+       Customer updated = customerService.update(id, customer);
+       return ResponseEntity.ok(updated);   
+    }
 }
