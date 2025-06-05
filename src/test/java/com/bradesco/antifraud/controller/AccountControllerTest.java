@@ -1,5 +1,5 @@
 // src/test/java/com/bradesco/antifraud/controller/AccountControllerTest.java
-/*
+
 package com.bradesco.antifraud.controller;
 
 import com.bradesco.antifraud.dto.AccountDTO;
@@ -176,4 +176,3 @@ class AccountControllerTest {
                 .andExpect(jsonPath("$.accountStatus").value(AccountStatus.ATIVA.toString()));
     }
 }
-*/

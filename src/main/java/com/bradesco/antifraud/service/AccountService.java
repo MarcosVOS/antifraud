@@ -1,5 +1,6 @@
 package com.bradesco.antifraud.service;
 
+import com.bradesco.antifraud.dto.AccountDTO;
 import com.bradesco.antifraud.exception.accountExceptions.AccountAlreadyExistsException;
 import com.bradesco.antifraud.model.Account;
 import com.bradesco.antifraud.repository.AccountRepository;
@@ -32,7 +33,7 @@ public class AccountService {
     @Transactional
     public Account createAccount(Account newAccount) {
         // 1. Verificar se já existe uma conta com o mesmo Id
-        if (accountRepository.findByAccountNumber(newAccount.getAccountNumber())) {
+        if (accountRepository.existsByAccountNumber((newAccount.getAccountNumber()))) {
             throw new AccountAlreadyExistsException("Account with Id " + newAccount.getId() + " already exists.");
         }
 
@@ -47,15 +48,15 @@ public class AccountService {
     }
 
     @Transactional
-    public Account updateAccount(UUID id, Account updatedAccountData) { // Pode precisar do customerId se for alterável
+    public Account updateAccount(UUID id, AccountDTO updatedAccountData) { // Pode precisar do customerId se for alterável
         Account existingAccount = accountRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Account with ID " + id + " does not exist."));
 
 
         // Verificar se o accountNumber está sendo alterado para um já existente (excluindo o próprio)
-        Optional<Account> accountByNewNumber = accountRepository.findById(updatedAccountData.getId());
+        Optional<Account> accountByNewNumber = accountRepository.findByAccountNumber(updatedAccountData.getAccountNumber());
         if (accountByNewNumber.isPresent() && !accountByNewNumber.get().getId().equals(id)) {
-            throw new AccountAlreadyExistsException("Account with number " + updatedAccountData.getId() + " already exists.");
+            throw new AccountAlreadyExistsException("Account with number " + updatedAccountData.getAccountNumber() + " already exists.");
         }
 
         // Atualizar campos da existingAccount com updatedAccountData
