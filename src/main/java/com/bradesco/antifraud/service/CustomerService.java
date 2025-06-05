@@ -1,5 +1,6 @@
 package com.bradesco.antifraud.service;
 
+import com.bradesco.antifraud.exception.accountExceptions.AccountAlreadyExistsException;
 import com.bradesco.antifraud.model.Customer;
 import com.bradesco.antifraud.repository.CustomerRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -17,5 +18,39 @@ public class CustomerService {
     public Customer findById(UUID id) {
         return repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Customer not found"));
+    }
+
+    public Customer create(Customer customer) {
+        if (repository.existsByCpf(customer.getCpf())) {
+            throw new AccountAlreadyExistsException("CPF já cadastrado: " + customer.getCpf());
+        }
+        if (repository.existsByEmail(customer.getEmail())) {
+            throw new AccountAlreadyExistsException("Email já cadastrado: " + customer.getEmail());
+        }
+
+        return repository.save(customer);
+    }
+
+    public Customer update(UUID id, Customer newData) {
+        Customer existing = repository.findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Cliente não encontrado"));
+
+        if (!existing.getCpf().equals(newData.getCpf()) && repository.existsByCpf(newData.getCpf())) {
+            throw new AccountAlreadyExistsException("CPF já cadastrado");
+        }
+
+        if (!existing.getEmail().equals(newData.getEmail()) && repository.existsByEmail(newData.getEmail())) {
+            throw new AccountAlreadyExistsException("Email já cadastrado");
+        }
+
+        existing.setName(newData.getName());
+        existing.setCpf(newData.getCpf());
+        existing.setDateOfBirth(newData.getDateOfBirth());
+        existing.setEmail(newData.getEmail());
+        existing.setPhone(newData.getPhone());
+        existing.setAddress(newData.getAddress());
+        existing.setPassword(newData.getPassword());
+
+        return repository.save(existing);
     }
 }

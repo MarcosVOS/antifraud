@@ -3,6 +3,7 @@ package com.bradesco.antifraud.controller;
 import com.bradesco.antifraud.model.Customer;
 import com.bradesco.antifraud.service.CustomerService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
@@ -20,5 +21,17 @@ public class CustomerController {
     @GetMapping("/{id}")
     public ResponseEntity<Customer> getById(@PathVariable UUID id) {
         return ResponseEntity.ok(customerService.findById(id));
+    }
+
+    @PostMapping
+    public ResponseEntity<Customer> createCustomer(@RequestBody @Valid Customer customer) {
+        Customer created = customerService.create(customer);
+        return ResponseEntity.status(201).body(created);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Customer> updateCustomer(@PathVariable UUID id, @RequestBody @Valid Customer customer) {
+       Customer updated = customerService.update(id, customer);
+       return ResponseEntity.ok(updated);   
     }
 }
