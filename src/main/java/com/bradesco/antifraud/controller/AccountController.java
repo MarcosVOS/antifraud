@@ -66,12 +66,8 @@ public ResponseEntity<Void> deleteAccount(@PathVariable String id) {
     @PutMapping("/updateAccount/{id}")
 public ResponseEntity<AccountDTO> updateAccount(@PathVariable String id, @RequestBody @Valid AccountDTO accountDTO) {
     UUID accountId = UUID.fromString(id);
-    if (!accountService.accountExists(accountId)) {
-        return ResponseEntity.notFound().build();
-    }
-    Account accountEntity = accountMapper.toEntity(accountDTO);
-    accountEntity.setId(accountId);
-    Account updatedAccount = accountService.updateAccount(accountId, accountEntity);
+ 
+    Account updatedAccount = accountService.updateAccount(accountId, accountDTO);
     AccountDTO updatedAccountDTO = accountMapper.toDTO(updatedAccount);
     
     return ResponseEntity.ok(updatedAccountDTO);

@@ -1,6 +1,7 @@
-/*
+
 package com.bradesco.antifraud.service;
 
+import com.bradesco.antifraud.dto.AccountDTO;
 import com.bradesco.antifraud.exception.accountExceptions.AccountAlreadyExistsException;
 import com.bradesco.antifraud.model.Account;
 import com.bradesco.antifraud.model.Address;
@@ -43,7 +44,7 @@ class AccountServiceTest {
     private UUID accountId;
 
 
-    UUID generatedId = UUID.randomUUID();
+
     UUID customerId = UUID.randomUUID();
     private Customer createMockCustomer(UUID customerId) {
         Address address = Address.builder()
@@ -142,7 +143,7 @@ class AccountServiceTest {
 
         // Mocking:
         // 1. findByAccountNumber retorna false (número de conta é único)
-        when(accountRepository.findByAccountNumber(newAccountNumber)).thenReturn(false);
+        when(accountRepository.existsByAccountNumber(newAccountNumber)).thenReturn(false);
         // 2. save é chamado com a conta (sem ID, com cliente) e retorna a conta com ID
         when(accountRepository.save(argThat(accToSave ->
                 accToSave.getAccountNumber().equals(newAccountNumber) &&
@@ -165,7 +166,7 @@ class AccountServiceTest {
         assertEquals(expectedSavedAccount.getCustomer(), actualSavedAccount.getCustomer(), "O cliente associado está incorreto.");
 
         // Verify
-        verify(accountRepository).findByAccountNumber(newAccountNumber);
+        verify(accountRepository).existsByAccountNumber(newAccountNumber);
         verify(accountRepository).save(argThat(accToSave ->
                 accToSave.getAccountNumber().equals(newAccountNumber) &&
                         accToSave.getCustomer().equals(createMockCustomer(customerId)) &&
@@ -176,7 +177,7 @@ class AccountServiceTest {
     }
 
     @Test
-    void createAccount_whenAccountNumberAlreadyExists_shouldThrowAccountAlreadyExistsException() {
+    void createAccount_whenAccountNumberAlreadyExists_ThrowAccountAlreadyExistsException() {
         // Arrange
         String existingAccountNumber = "12345"; // Número de conta que simula existência
 
@@ -190,7 +191,7 @@ class AccountServiceTest {
                 .build(); // ID é nulo
 
         // Mocking: findByAccountNumber retorna true (conta já existe)
-        when(accountRepository.findByAccountNumber(existingAccountNumber)).thenReturn(true);
+        when(accountRepository.existsByAccountNumber(existingAccountNumber)).thenReturn(true);
 
         // Act & Assert
         AccountAlreadyExistsException exception = assertThrows(AccountAlreadyExistsException.class, () -> {
@@ -202,71 +203,120 @@ class AccountServiceTest {
 
 
         // Verify
-        verify(accountRepository).findByAccountNumber(existingAccountNumber);
+        verify(accountRepository).existsByAccountNumber(existingAccountNumber);
         verify(accountRepository, never()).save(any(Account.class)); // Garante que save não foi chamado
         verifyNoMoreInteractions(accountRepository);
         verifyNoInteractions(customerRepository);
     }
 
     @Test
-    void deleteAccount_shouldCallRepositoryDeleteById() {
+    void deleteAccount_CallRepositoryDeleteById() {
+     
+        // Mocking the check for account existence, assuming your service method does this.
+        when(accountRepository.existsById(accountId)).thenReturn(true);
+       
         doNothing().when(accountRepository).deleteById(accountId);
 
         accountService.deleteAccount(accountId);
 
+       
+        // Verify that the existence check was performed
+        verify(accountRepository).existsById(accountId);
+        // Verify that the account deletion was called on the repository
         verify(accountRepository).deleteById(accountId);
+
+        // Verify that the customer associated with this account was NOT deleted.
+        // 'this.customerId' is the ID of the customer associated with 'this.account' in setUp.
+        verify(customerRepository, never()).deleteById(this.customerId);
     }
 
     @Test
-    void updateAccount_whenAccountExists_shouldUpdateAndReturnAccount() {
-        Account updatedInfo = Account.builder()
-                .accountNumber("12345-updated")
-                .agency("001-updated")
-                .balance(BigDecimal.ONE)
-                .accountType(Account.AccountType.POUPANCA)
-                .accountStatus(Account.AccountStatus.ATIVA)
-                .customer(createMockCustomer(customerId))
-                .build(); // ID não é necessário aqui, será setado pelo serviço
+    void updateAccountshouldUpdateAndReturnAccount() {
+        UUID newCustomerIdForUpdate = UUID.randomUUID();
+        Customer newMockCustomer = createMockCustomer(newCustomerIdForUpdate);
 
-        Account expectedUpdatedAccount = Account.builder()
-                .id(accountId) // ID é mantido
+        AccountDTO updatedInfo = AccountDTO.builder()
                 .accountNumber("12345-updated")
                 .agency("001-updated")
                 .balance(BigDecimal.ONE)
                 .accountType(Account.AccountType.POUPANCA)
                 .accountStatus(Account.AccountStatus.ATIVA)
-                .customer(createMockCustomer(customerId))
+              //  .customerId(newCustomerIdForUpdate) // Novo ID de cliente para atualização
                 .build();
 
-        when(accountRepository.existsById(accountId)).thenReturn(true);
-        when(accountRepository.save(any(Account.class))).thenReturn(expectedUpdatedAccount);
+        Account existingAccountEntity = this.account; 
 
-        Account result = accountService.updateAccount(accountId, updatedInfo);
+        // Mocking:
+        // 1. Serviço vai chamar findById para carregar a conta existente
+        when(accountRepository.findById(this.accountId)).thenReturn(Optional.of(existingAccountEntity));
 
-        assertEquals(expectedUpdatedAccount, result);
-        assertEquals(accountId, result.getId()); // Garante que o ID foi setado corretamente
-        verify(accountRepository).existsById(accountId);
-        // Verifica se o save foi chamado com o objeto Account que tem o ID correto
+        // 2. Serviço vai verificar se o novo número de conta já existe (para outra conta)
+        when(accountRepository.findByAccountNumber(updatedInfo.getAccountNumber()))
+                .thenReturn(Optional.empty()); // Assume que o novo número não conflita
+
+
+        // 3. Serviço vai salvar a entidade atualizada.
+        // Usamos thenAnswer para retornar a entidade que foi passada para save,
+        // pois ela já terá sido modificada pelo serviço.
+        when(accountRepository.save(any(Account.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Act
+        Account actualUpdatedAccountEntity = accountService.updateAccount(this.accountId, updatedInfo);
+
+        // Assert
+        assertNotNull(actualUpdatedAccountEntity);
+        assertEquals(this.accountId, actualUpdatedAccountEntity.getId(), "Account ID should remain unchanged.");
+        assertEquals(updatedInfo.getAccountNumber(), actualUpdatedAccountEntity.getAccountNumber());
+        assertEquals(updatedInfo.getAgency(), actualUpdatedAccountEntity.getAgency());
+        assertEquals(0, updatedInfo.getBalance().compareTo(actualUpdatedAccountEntity.getBalance()));
+        assertEquals(updatedInfo.getAccountType(), actualUpdatedAccountEntity.getAccountType());
+        assertEquals(updatedInfo.getAccountStatus(), actualUpdatedAccountEntity.getAccountStatus());
+        assertNotNull(actualUpdatedAccountEntity.getCustomer(), "Customer should not be null.");
+        assertEquals(newMockCustomer.getName(), actualUpdatedAccountEntity.getCustomer().getName(), "Customer details should reflect the new customer.");
+
+
+        // Verify
+        verify(accountRepository).findById(this.accountId);
+        verify(accountRepository).findByAccountNumber(updatedInfo.getAccountNumber());
         verify(accountRepository).save(argThat(savedAccount ->
-            savedAccount.getId().equals(accountId) &&
-            savedAccount.getAccountNumber().equals("12345-updated")
+            savedAccount.getId().equals(this.accountId) &&
+            savedAccount.getAccountNumber().equals(updatedInfo.getAccountNumber())
         ));
     }
 
     @Test
     void updateAccount_whenAccountDoesNotExist_shouldThrowEntityNotFoundException() {
-        UUID nonExistentId = UUID.randomUUID();
-        Account updatedInfo = Account.builder().build();
+          // Given
+        UUID nonExistentAccountId = UUID.randomUUID();
+        UUID mockCustomerIdForUpdate = UUID.randomUUID(); // A different ID for clarity if needed
+        Customer customerDetailsForUpdate = createMockCustomer(mockCustomerIdForUpdate);
 
-        when(accountRepository.existsById(nonExistentId)).thenReturn(false);
+        AccountDTO updatedInfoWithCustomer = AccountDTO.builder()
+                .accountNumber("98765") // Example data
+                .agency("00X")
+                .balance(new BigDecimal("500.00"))
+                .accountType(Account.AccountType.INVESTIMENTO)
+                .accountStatus(Account.AccountStatus.BLOQUADA)
+                .customerId(customerDetailsForUpdate.getId()) // Include mock customer in the update data
+                .build();
 
-        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
-            accountService.updateAccount(nonExistentId, updatedInfo);
+        // Mock the repository to indicate the account does not exist
+        when(accountRepository.findById(nonExistentAccountId)).thenReturn(Optional.empty());
+
+
+         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
+            accountService.updateAccount(nonExistentAccountId, updatedInfoWithCustomer);
         });
 
-        assertEquals("Account with ID " + nonExistentId + " does not exist.", exception.getMessage());
-        verify(accountRepository).existsById(nonExistentId);
+        // Assert the exception message is correct
+        assertEquals("Account with ID " + nonExistentAccountId + " does not exist.", exception.getMessage());
+
+        // Verify
+        // Ensure the check for account existence was made
+        verify(accountRepository).findById(nonExistentAccountId);
         verify(accountRepository, never()).save(any(Account.class));
+        verify(customerRepository, never()).save(any(Customer.class));
+        verify(customerRepository, never()).findById(any(UUID.class));
     }
 
     @Test
@@ -289,4 +339,3 @@ class AccountServiceTest {
         verify(accountRepository).existsById(accountId);
     }
 }
-*/
