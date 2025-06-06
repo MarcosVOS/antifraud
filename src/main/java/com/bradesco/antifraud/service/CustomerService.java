@@ -53,4 +53,11 @@ public class CustomerService {
 
         return repository.save(existing);
     }
+
+    public void delete(UUID id) {
+        Customer customer = repository.findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Cliente não encontrado"));
+
+        repository.deleteById(customer.getId());
+    }
 }

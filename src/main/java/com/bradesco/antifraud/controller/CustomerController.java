@@ -34,4 +34,10 @@ public class CustomerController {
        Customer updated = customerService.update(id, customer);
        return ResponseEntity.ok(updated);   
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteCustomer(@PathVariable UUID id) {
+        customerService.delete(id);
+        return ResponseEntity.noContent().build(); // HTTP 204
+}
 }

@@ -24,7 +24,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
 
-         @ExceptionHandler(AccountAlreadyExistsException.class)
+    @ExceptionHandler(AccountAlreadyExistsException.class)
     public ResponseEntity<Object>AccountAlreadyExists(AccountAlreadyExistsException ex) {
         Map<String, Object> body = new HashMap<>();
         body.put("timestamp", LocalDateTime.now());
