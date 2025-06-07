@@ -30,7 +30,6 @@ public class AccessLog {
     @NotNull(message = "Customer is required")
     private Customer customer;
 
-    private String ipAddress;
     private String userAgent;
     private String path;
     private LocalDateTime accessTime;

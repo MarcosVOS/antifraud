@@ -1,7 +1,6 @@
 package com.bradesco.antifraud.controller;
 
 import com.bradesco.antifraud.model.AccessLog;
-import com.bradesco.antifraud.model.Customer;
 import com.bradesco.antifraud.service.AccessLogService;
 
 import lombok.RequiredArgsConstructor;
@@ -13,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @RestController
