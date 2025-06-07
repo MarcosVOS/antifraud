@@ -29,4 +29,8 @@ public class AccessLog {
     @JoinColumn(name = "customer_id", nullable = false)
     @NotNull(message = "Customer is required")
     private Customer customer;
+
+    private String userAgent;
+    private String path;
+    private LocalDateTime accessTime;
 }
