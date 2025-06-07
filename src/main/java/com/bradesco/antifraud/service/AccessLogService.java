@@ -48,4 +48,12 @@ public class AccessLogService {
 
     return repository.save(log);
 }
+
+private String getClientIp(HttpServletRequest request) {
+        String forwarded = request.getHeader("X-Forwarded-For");
+        if (forwarded != null && !forwarded.isEmpty()) {
+            return forwarded.split(",")[0];
+        }
+        return request.getRemoteAddr();
+    }
 }
