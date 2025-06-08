@@ -7,6 +7,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -59,5 +60,9 @@ public class CustomerService {
             .orElseThrow(() -> new EntityNotFoundException("Cliente não encontrado"));
 
         repository.deleteById(customer.getId());
+    }
+
+    public List<Customer> getAllCustomers() {
+        return repository.findAll();
     }
 }
