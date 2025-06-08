@@ -1,0 +1,23 @@
+### POST - Criar um novo log de acesso
+POST http://localhost:8080/logs?customerId=52676191-ac7a-424d-ab54-9704b6197d03
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)
+X-Forwarded-For: 192.168.1.10
+
+### GET - Buscar log por ID
+GET http://localhost:8080/logs/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+
+### GET - Listar todos os logs (caso tenha esse endpoint implementado)
+GET http://localhost:8080/logs
+
+### DELETE - Remover um log por ID
+DELETE http://localhost:8080/logs/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+
+### POST - Outro log com IP e User-Agent diferentes
+POST http://localhost:8080/logs?customerId=52676191-ac7a-424d-ab54-9704b6197d03
+User-Agent: curl/7.79.1
+X-Forwarded-For: 10.0.0.5
+
+### POST - Simulando acesso a uma rota de transações
+POST http://localhost:8080/logs?customerId=52676191-ac7a-424d-ab54-9704b6197d03
+User-Agent: PostmanRuntime/7.30.0
+X-Forwarded-For: 203.0.113.42

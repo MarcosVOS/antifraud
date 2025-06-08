@@ -47,4 +47,9 @@ public class AccessLogService {
     return repository.save(log);
 }
 
+public void deleteById(UUID id) {
+        AccessLog log = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Access log not found"));
+        repository.delete(log);
+    }
 }
