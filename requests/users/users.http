@@ -1,1 +1,82 @@
 GET http://localhost:8080/customers/52676191-ac7a-424d-ab54-9704b6197d03
+
+### Buscar cliente por ID
+GET http://localhost:8080/customers/{id}
+### Output: 200 OK
+# {
+#   "id": "uuid-do-cliente",
+#   "name": "Lucas da Silva",
+#   "cpf": "123.456.789-00",
+#   "email": "lucas.silva@gmail.com",
+#   "phone": "11999999999",
+#   "dateOfBirth": "1990-01-01",
+#   "address": "Rua A, 123",
+#   "password": "senha123"
+# }
+
+### Criar um novo cliente
+POST http://localhost:8080/customers
+Content-Type: application/json
+{
+  "name": "Lucas da Silva",
+  "cpf": "123.456.789-00",
+  "email": "lucas.silva@gmail.com",
+  "phone": "11999999999",
+  "dateOfBirth": "1990-01-01",
+  "address": "Rua A, 123",
+  "password": "senha123"
+}
+### Output: 201 Created
+# {
+#   "id": "uuid-do-cliente-criado",
+#   "name": "Lucas da Silva",
+#   "cpf": "123.456.789-00",
+#   "email": "lucas.silva@gmail.com",
+#   "phone": "11999999999",
+#   "dateOfBirth": "1990-01-01",
+#   "address": "Rua A, 123",
+#   "password": "senha123"
+# }
+
+### Atualizar cliente por ID
+PUT http://localhost:8080/customers/{id}
+Content-Type: application/json
+
+{
+  "name": "Lucas da Silva Atualizado",
+  "cpf": "123.456.789-00",
+  "email": "lucas.atualizado@gmail.com",
+  "phone": "11988888888",
+  "dateOfBirth": "1990-01-01",
+  "address": "Rua B, 456",
+  "password": "novaSenha123"
+}
+
+### Deletar cliente por ID
+DELETE http://localhost:8080/customers/{id}
+
+### Listar todos os clientes
+GET http://localhost:8080/customers
+### Output: 200 OK
+# [
+#   {
+#     "id": "uuid-do-cliente1",
+#     "name": "Lucas da Silva",
+#     "cpf": "123.456.789-00",
+#     "email": "lucas.silva@gmail.com",
+#     "phone": "11999999999",
+#     "dateOfBirth": "1990-01-01",
+#     "address": "Rua A, 123",
+#     "password": "senha123"
+#   },
+#   {
+#     "id": "uuid-do-cliente2",
+#     "name": "Lilian Souza",
+#     "cpf": "987.654.321-00",
+#    "email": "lilian.souza@gmail.com",
+     "phone": "11977777777",
+     "dateOfBirth": "1985-05-05",
+     "address": "Rua C, 789",
+     "password": "senha456"
+   }
+# ]
