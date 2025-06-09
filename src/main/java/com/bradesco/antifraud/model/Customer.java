@@ -40,9 +40,22 @@ public class Customer {
     @Pattern(regexp = "\\+?\\d{10,15}", message = "Invalid phone number")
     private String phone;
 
-    @Embedded
+    @Embedded 
     private Address address;
 
     @NotBlank(message = "Password is required")
     private String password;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Customer customer = (Customer) o;
+        return id != null && id.equals(customer.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : 0;
+    }
 }

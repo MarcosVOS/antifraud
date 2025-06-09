@@ -4,13 +4,14 @@ import com.bradesco.antifraud.dto.AccountDTO;
 import com.bradesco.antifraud.model.Account;
 import com.bradesco.antifraud.model.Account.AccountStatus;
 import com.bradesco.antifraud.model.Account.AccountType;
+import com.bradesco.antifraud.model.Customer;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
-
 import java.math.BigDecimal;
 import java.util.UUID;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class AccountMapperTest {
 
@@ -18,13 +19,19 @@ class AccountMapperTest {
 
     @Test
     void testToDTO() {
-        Account account = new Account();
-        account.setId(UUID.randomUUID());
-        account.setAccountNumber("12345");
-        account.setAgency("001");
-        account.setBalance(BigDecimal.TEN);
-        account.setAccountType(AccountType.CORRENTE);
-        account.setAccountStatus(AccountStatus.ATIVA);
+        UUID customerId = UUID.randomUUID();
+        Customer customer = new Customer();
+        customer.setId(customerId);
+
+        Account account = Account.builder()
+                .id(UUID.randomUUID())
+                .accountNumber("12345")
+                .agency("001")
+                .balance(BigDecimal.TEN)
+                .accountType(AccountType.CORRENTE)
+                .accountStatus(AccountStatus.ATIVA)
+                .customer(customer)
+                .build();
 
         AccountDTO accountDTO = accountMapper.toDTO(account);
 
@@ -34,17 +41,22 @@ class AccountMapperTest {
         assertEquals(account.getBalance(), accountDTO.getBalance());
         assertEquals(account.getAccountType(), accountDTO.getAccountType());
         assertEquals(account.getAccountStatus(), accountDTO.getAccountStatus());
+        assertEquals(customerId, accountDTO.getCustomerId());
     }
 
     @Test
     void testToEntity() {
+        UUID accountId = UUID.randomUUID();
+        UUID customerId = UUID.randomUUID();
+
         AccountDTO accountDTO = AccountDTO.builder()
-                .id(UUID.randomUUID())
+                .id(accountId)
                 .accountNumber("12345")
                 .agency("001")
                 .balance(BigDecimal.TEN)
                 .accountType(AccountType.POUPANCA)
                 .accountStatus(AccountStatus.INATIVA)
+                .customerId(customerId)
                 .build();
 
         Account account = accountMapper.toEntity(accountDTO);
@@ -55,5 +67,8 @@ class AccountMapperTest {
         assertEquals(accountDTO.getBalance(), account.getBalance());
         assertEquals(accountDTO.getAccountType(), account.getAccountType());
         assertEquals(accountDTO.getAccountStatus(), account.getAccountStatus());
+        assertNotNull(account.getCustomer());
+        assertEquals(customerId, account.getCustomer().getId());
+        assertNull(account.getCustomer().getName()); 
     }
 }

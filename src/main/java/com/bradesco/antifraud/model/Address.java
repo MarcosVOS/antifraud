@@ -1,34 +1,36 @@
 package com.bradesco.antifraud.model;
 
-import jakarta.persistence.Embeddable;
-import jakarta.validation.constraints.*;
+import jakarta.persistence.Embeddable; 
+import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import lombok.*;
-
-@Embeddable
+@Embeddable 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class Address {
 
-    @NotBlank(message = "Street is required")
+    @NotBlank
     private String street;
 
-    @NotBlank(message = "Number is required")
+    @NotBlank
     private String number;
 
-    @NotBlank(message = "Neighborhood is required")
+    private String complement; 
+
+    @NotBlank
     private String neighborhood;
 
-    @NotBlank(message = "City is required")
+    @NotBlank
     private String city;
 
-    @NotBlank(message = "State is required")
-    @Size(min=2, max=2)
-    private String state;
+    @NotBlank
+    private String state; 
 
-    @NotBlank(message = "ZipCode is required")
-    @Pattern(regexp = "\\d{5}-?\\d{3}", message = "Invalid zip code format")
-    private String zipCode;
+    @NotBlank
+    private String zipCode; 
 }

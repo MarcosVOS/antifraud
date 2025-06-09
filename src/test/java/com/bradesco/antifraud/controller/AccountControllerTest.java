@@ -1,5 +1,3 @@
-// src/test/java/com/bradesco/antifraud/controller/AccountControllerTest.java
-
 package com.bradesco.antifraud.controller;
 
 import com.bradesco.antifraud.dto.AccountDTO;
@@ -19,6 +17,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles; 
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import java.math.BigDecimal;
@@ -31,9 +30,12 @@ import static org.hamcrest.Matchers.endsWith;
 import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put; 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete; 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(AccountController.class)
+@ActiveProfiles("test") 
 class AccountControllerTest {
 
     @Autowired
@@ -47,8 +49,6 @@ class AccountControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    UUID generatedId = UUID.randomUUID();
-    UUID customerId = UUID.randomUUID();
     private Customer createMockCustomer(UUID customerId) {
         Address address = Address.builder()
                 .street("Main St")
@@ -62,11 +62,11 @@ class AccountControllerTest {
         return Customer.builder()
                 .id(customerId)
                 .name("John Doe")
-                .cpf("12345678909") // Use a valid CPF generator for real tests if needed
+                .cpf("12345678909")
                 .dateOfBirth(LocalDate.of(1990, 1, 1))
-                .email("john.doe@example.com") // Valid email
+                .email("john.doe@example.com")
                 .phone("+5511999998888")
-                .address(address)
+                .address(address) 
                 .password("securePassword123")
                 .build();
     }
@@ -74,6 +74,7 @@ class AccountControllerTest {
     @Test
     void getAccountByID_found_returnsOk() throws Exception {
         UUID id = UUID.randomUUID();
+        UUID customerId = UUID.randomUUID();
 
         Account account = Account.builder()
                 .id(id)
@@ -97,15 +98,15 @@ class AccountControllerTest {
         Mockito.when(accountService.getAccountById(id)).thenReturn(Optional.of(account));
         Mockito.when(accountMapper.toDTO(account)).thenReturn(dto);
 
-
-        mockMvc.perform(get("/accounts/"+ id))
+        mockMvc.perform(get("/accounts/" + id))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(id.toString()))
                 .andExpect(jsonPath("$.accountNumber").value("12345"))
                 .andExpect(jsonPath("$.agency").value("001"))
-                .andExpect(jsonPath("$.balance").value(BigDecimal.TEN.doubleValue())) // Para BigDecimal, compare o valor double
+                .andExpect(jsonPath("$.balance").value(BigDecimal.TEN.doubleValue()))
                 .andExpect(jsonPath("$.accountType").value(AccountType.CORRENTE.toString()))
-                .andExpect(jsonPath("$.accountStatus").value(AccountStatus.ATIVA.toString()));
+                .andExpect(jsonPath("$.accountStatus").value(AccountStatus.ATIVA.toString()))
+                .andExpect(jsonPath("$.customerId").value(customerId.toString()));
     }
 
     @Test
@@ -113,21 +114,22 @@ class AccountControllerTest {
         UUID id = UUID.randomUUID();
         Mockito.when(accountService.getAccountById(id)).thenReturn(Optional.empty());
 
-        mockMvc.perform(get("/accounts/"))
+        mockMvc.perform(get("/accounts/" + id))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     void createAccount_returnsCreated() throws Exception {
+        UUID generatedId = UUID.randomUUID();
+        UUID customerId = UUID.randomUUID();
 
-        // Mockando um ID de cliente, se necessário
         AccountDTO requestDto = AccountDTO.builder()
                 .accountNumber("67890")
                 .agency("002")
                 .balance(new BigDecimal("100.50"))
                 .accountType(AccountType.POUPANCA)
                 .accountStatus(AccountStatus.ATIVA)
-                .customerId(createMockCustomer(customerId).getId())
+                .customerId(customerId)
                 .build();
 
         Account accountEntityToCreate = Account.builder()
@@ -136,11 +138,11 @@ class AccountControllerTest {
                 .balance(new BigDecimal("100.50"))
                 .accountType(AccountType.POUPANCA)
                 .accountStatus(AccountStatus.ATIVA)
-                .customer(createMockCustomer(customerId))
+                .customer(createMockCustomer(customerId)) 
                 .build();
 
         Account createdAccountEntity = Account.builder()
-                .id(generatedId) // O serviço deve gerar o ID
+                .id(generatedId)
                 .accountNumber("67890")
                 .agency("002")
                 .balance(new BigDecimal("100.50"))
@@ -156,7 +158,7 @@ class AccountControllerTest {
                 .balance(new BigDecimal("100.50"))
                 .accountType(AccountType.POUPANCA)
                 .accountStatus(AccountStatus.ATIVA)
-                .customerId(createMockCustomer(generatedId).getId())
+                .customerId(customerId)
                 .build();
 
         Mockito.when(accountMapper.toEntity(any(AccountDTO.class))).thenReturn(accountEntityToCreate);
@@ -167,12 +169,86 @@ class AccountControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDto)))
                 .andExpect(status().isCreated())
-                .andExpect(header().string("Location", endsWith("/accounts/newaccount/"+generatedId)))
+                .andExpect(header().string("Location", endsWith("/accounts/" + generatedId)))
                 .andExpect(jsonPath("$.id").value(generatedId.toString()))
                 .andExpect(jsonPath("$.accountNumber").value("67890"))
                 .andExpect(jsonPath("$.agency").value("002"))
                 .andExpect(jsonPath("$.balance").value(100.50))
                 .andExpect(jsonPath("$.accountType").value(AccountType.POUPANCA.toString()))
-                .andExpect(jsonPath("$.accountStatus").value(AccountStatus.ATIVA.toString()));
+                .andExpect(jsonPath("$.accountStatus").value(AccountStatus.ATIVA.toString()))
+                .andExpect(jsonPath("$.customerId").value(customerId.toString()));
+    }
+
+    @Test
+    void deleteAccount_returnsNoContent() throws Exception {
+        UUID id = UUID.randomUUID();
+        Mockito.when(accountService.accountExists(id)).thenReturn(true);
+        Mockito.doNothing().when(accountService).deleteAccount(id);
+
+        mockMvc.perform(delete("/accounts/deleteAccount/" + id))
+                .andExpect(status().isNoContent());
+
+        Mockito.verify(accountService, Mockito.times(1)).accountExists(id);
+        Mockito.verify(accountService, Mockito.times(1)).deleteAccount(id);
+    }
+
+    @Test
+    void deleteAccount_notFound_returns404() throws Exception {
+        UUID id = UUID.randomUUID();
+        Mockito.when(accountService.accountExists(id)).thenReturn(false);
+        mockMvc.perform(delete("/accounts/deleteAccount/" + id))
+                .andExpect(status().isNotFound());
+        Mockito.verify(accountService, Mockito.times(1)).accountExists(id);
+        Mockito.verify(accountService, Mockito.never()).deleteAccount(id);
+    }
+
+    @Test
+    void updateAccount_returnsOk() throws Exception {
+        UUID id = UUID.randomUUID();
+        UUID customerId = UUID.randomUUID();
+
+        AccountDTO requestDto = AccountDTO.builder()
+                .accountNumber("updated-number")
+                .agency("003")
+                .balance(new BigDecimal("200.00"))
+                .accountType(AccountType.INVESTIMENTO)
+                .accountStatus(AccountStatus.BLOQUEADA)
+                .customerId(customerId)
+                .build();
+
+        Account updatedAccountEntity = Account.builder()
+                .id(id)
+                .accountNumber("updated-number")
+                .agency("003")
+                .balance(new BigDecimal("200.00"))
+                .accountType(AccountType.INVESTIMENTO)
+                .accountStatus(AccountStatus.BLOQUEADA)
+                .customer(createMockCustomer(customerId))
+                .build();
+
+        AccountDTO responseDto = AccountDTO.builder()
+                .id(id)
+                .accountNumber("updated-number")
+                .agency("003")
+                .balance(new BigDecimal("200.00"))
+                .accountType(AccountType.INVESTIMENTO)
+                .accountStatus(AccountStatus.BLOQUEADA)
+                .customerId(customerId)
+                .build();
+
+        Mockito.when(accountService.updateAccount(Mockito.eq(id), any(AccountDTO.class))).thenReturn(updatedAccountEntity);
+        Mockito.when(accountMapper.toDTO(updatedAccountEntity)).thenReturn(responseDto);
+
+        mockMvc.perform(put("/accounts/updateAccount/" + id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(id.toString()))
+                .andExpect(jsonPath("$.accountNumber").value("updated-number"))
+                .andExpect(jsonPath("$.agency").value("003"))
+                .andExpect(jsonPath("$.balance").value(200.00))
+                .andExpect(jsonPath("$.accountType").value(AccountType.INVESTIMENTO.toString()))
+                .andExpect(jsonPath("$.accountStatus").value(AccountStatus.BLOQUEADA.toString()))
+                .andExpect(jsonPath("$.customerId").value(customerId.toString()));
     }
 }
