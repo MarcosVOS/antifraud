@@ -39,7 +39,7 @@ public class CustomerService {
 
     public Customer update(UUID id, Customer newData) {
         Customer existing = repository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Cliente não encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Cliente não encontrado"));
 
         if (!existing.getCpf().equals(newData.getCpf()) && repository.existsByCpf(newData.getCpf())) {
             throw new AccountAlreadyExistsException("CPF já cadastrado");
@@ -65,12 +65,16 @@ public class CustomerService {
 
     public void delete(UUID id) {
         Customer customer = repository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Cliente não encontrado"));
+                .orElseThrow(() -> new EntityNotFoundException("Cliente não encontrado"));
 
         repository.deleteById(customer.getId());
     }
 
     public List<Customer> getAllCustomers() {
         return repository.findAll();
+    }
+
+    public Customer findByEmail(String email) {
+        return repository.findByEmail(email).orElse(null);
     }
 }
