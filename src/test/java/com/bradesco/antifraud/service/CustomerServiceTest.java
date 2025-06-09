@@ -5,6 +5,7 @@ import com.bradesco.antifraud.repository.CustomerRepository;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -14,8 +15,9 @@ import static org.mockito.Mockito.*;
 
 public class CustomerServiceTest {
 
-    private final CustomerRepository repository = Mockito.mock(CustomerRepository.class);
-    private final CustomerService service = new CustomerService(repository);
+    CustomerRepository repository = Mockito.mock(CustomerRepository.class);
+    PasswordEncoder passwordEncoder = Mockito.mock(PasswordEncoder.class);
+    CustomerService service = new CustomerService(repository, passwordEncoder);
 
     @Test
     void testFindById() {

@@ -5,6 +5,8 @@ import com.bradesco.antifraud.model.Customer;
 import com.bradesco.antifraud.repository.CustomerRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,6 +17,7 @@ import java.util.UUID;
 public class CustomerService {
 
     private final CustomerRepository repository;
+    private final PasswordEncoder passwordEncoder;
 
     public Customer findById(UUID id) {
         return repository.findById(id)
@@ -28,6 +31,8 @@ public class CustomerService {
         if (repository.existsByEmail(customer.getEmail())) {
             throw new AccountAlreadyExistsException("Email já cadastrado: " + customer.getEmail());
         }
+
+        customer.setPassword(passwordEncoder.encode(customer.getPassword()));
 
         return repository.save(customer);
     }
@@ -50,7 +55,10 @@ public class CustomerService {
         existing.setEmail(newData.getEmail());
         existing.setPhone(newData.getPhone());
         existing.setAddress(newData.getAddress());
-        existing.setPassword(newData.getPassword());
+
+        if (!newData.getPassword().equals(existing.getPassword())) {
+            existing.setPassword(passwordEncoder.encode(newData.getPassword()));
+        }
 
         return repository.save(existing);
     }
