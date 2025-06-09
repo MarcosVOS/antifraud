@@ -23,7 +23,7 @@ services:
   
   app:
     build: .
-    restart: unless-stopped
+    #restart: unless-stopped
     env_file:
       - .env
     ports:
