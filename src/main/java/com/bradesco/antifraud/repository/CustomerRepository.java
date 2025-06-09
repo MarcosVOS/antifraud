@@ -10,19 +10,27 @@ import java.util.UUID;
 @Repository
 public interface CustomerRepository extends JpaRepository<Customer, UUID> {
 
-    @param cpf 
-    @return 
+    /**
+     * @param cpf 
+     * @return 
+     */
     Optional<Customer> findByCpf(String cpf);
 
-    @param cpf 
-    @return 
+    /**
+     * @param cpf 
+     * @return 
+     */
     boolean existsByCpf(String cpf);
 
-    @param email 
-    @return 
+    /**
+     * @param email 
+     * @return 
+     */
     Optional<Customer> findByEmail(String email);
 
-    @param email 
-    @return 
+    /**
+     * @param email The email to check.
+     * @return 
+     */
     boolean existsByEmail(String email);
 }
