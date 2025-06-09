@@ -84,6 +84,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency> 
+        <dependency>
+            <groupId>com.azure.spring</groupId>
+            <artifactId>azure-communication-email</artifactId>
+            <version>1.0.2</version>
         </dependency>
 
     </dependencies>
