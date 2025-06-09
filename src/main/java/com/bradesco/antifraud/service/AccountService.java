@@ -30,7 +30,7 @@ public class AccountService {
         return accountRepository.findById(id);
     }
 
-    @Transactional
+
     public Account createAccount(Account newAccount) {
         // 1. Verificar se já existe uma conta com o mesmo Id
         if (accountRepository.existsByAccountNumber((newAccount.getAccountNumber()))) {
@@ -47,7 +47,7 @@ public class AccountService {
         accountRepository.deleteById(id);
     }
 
-    @Transactional
+
     public Account updateAccount(UUID id, AccountDTO updatedAccountData) { // Pode precisar do customerId se for alterável
         Account existingAccount = accountRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Account with ID " + id + " does not exist."));
