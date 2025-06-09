@@ -1,6 +1,6 @@
 package com.bradesco.antifraud.dto;
 
-import com.bradesco.antifraud.model.Transaction; // Importa a enum TransactionType
+import com.bradesco.antifraud.model.Transaction; // Importa a classe Transaction
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -12,16 +12,16 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Data 
-@Builder 
-@NoArgsConstructor 
-@AllArgsConstructor 
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class TransactionDTO {
 
-    private UUID id; 
+    private UUID id;
 
-    @NotNull(message = "O tipo da transação é obrigatório.")
-    private Transaction.TransactionType tipo; 
+    @NotNull(message = "O status da transação é obrigatório.") // Mensagem atualizada para 'status'
+    private Transaction.TransactionStatus status; // <-- Corrigido para Transaction.TransactionStatus e campo 'status'
 
     @NotNull(message = "O valor da transação é obrigatório.")
     @DecimalMin(value = "0.01", message = "O valor da transação deve ser maior que zero.")

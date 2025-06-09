@@ -8,6 +8,8 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
+import java.util.UUID;
+
 @Mapper(componentModel = "spring")
 public interface AccountMapper {
 
