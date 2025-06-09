@@ -1,66 +1,81 @@
 package com.bradesco.antifraud.controller;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Optional;
-import java.util.UUID;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
+import com.bradesco.antifraud.dto.TransactionDTO;
+import com.bradesco.antifraud.mapper.TransactionMapper;
 import com.bradesco.antifraud.model.Transaction;
 import com.bradesco.antifraud.service.TransactionService;
-
-import jakarta.validation.Valid;
+import jakarta.validation.Valid; // Importação correta para @Valid
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.server.ResponseStatusException; 
+import java.net.URI;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors; 
 
 @RestController
 @RequestMapping("/transactions")
 public class TransactionController {
 
-    private TransactionService service;
+    private final TransactionService transactionService;
+    private final TransactionMapper transactionMapper; 
 
-    public TransactionController(TransactionService service){
-        this.service = service;
+    public TransactionController(TransactionService transactionService, TransactionMapper transactionMapper) {
+        this.transactionService = transactionService;
+        this.transactionMapper = transactionMapper;
     }
-    
+
     @PostMapping
-    public ResponseEntity<Transaction> create(@Valid @RequestBody Transaction transaction){
-        Transaction created = service.create(transaction);
-        URI location = URI.create("/transactions/" + created.getId());
-        return ResponseEntity.created(location).body(created);
+    public ResponseEntity<TransactionDTO> create(@Valid @RequestBody TransactionDTO transactionDTO) {
+        Transaction transactionToCreate = transactionMapper.toEntity(transactionDTO);
+        
+        Transaction createdTransaction = transactionService.create(transactionToCreate);
+        
+        TransactionDTO createdTransactionDTO = transactionMapper.toDTO(createdTransaction);
+
+        URI location = ServletUriComponentsBuilder.fromCurrentRequestUri()
+                                                  .path("/{id}")
+                                                  .buildAndExpand(createdTransactionDTO.getId())
+                                                  .toUri();
+        return ResponseEntity.created(location).body(createdTransactionDTO);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Transaction> findById(@PathVariable UUID id){
-        Optional<Transaction> transaction = service.findById(id);
-        if (transaction.isPresent()) {
-            return ResponseEntity.ok(transaction.get());
-        }else{
+    public ResponseEntity<TransactionDTO> findById(@PathVariable UUID id) {
+        Optional<Transaction> transactionOptional = transactionService.findById(id);
+
+        if (transactionOptional.isPresent()) {
+            TransactionDTO transactionDTO = transactionMapper.toDTO(transactionOptional.get());
+            return ResponseEntity.ok(transactionDTO);
+        } else {
             return ResponseEntity.notFound().build();
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Transaction> update(@PathVariable UUID id, @Valid @RequestBody Transaction transaction){
-        Transaction updated = service.update(id, transaction);
-        return ResponseEntity.ok(updated);
+    public ResponseEntity<TransactionDTO> update(@PathVariable UUID id, @Valid @RequestBody TransactionDTO transactionDTO) {
+        transactionDTO.setId(id); 
+        Transaction transactionToUpdate = transactionMapper.toEntity(transactionDTO);
+        Transaction updatedTransaction = transactionService.update(id, transactionToUpdate);
+        TransactionDTO updatedTransactionDTO = transactionMapper.toDTO(updatedTransaction);
+        return ResponseEntity.ok(updatedTransactionDTO);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable UUID id){
-        service.delete(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Void> delete(@PathVariable UUID id) {
+        transactionService.delete(id);
+        return ResponseEntity.noContent().build(); 
     }
 
     @GetMapping
-    public ResponseEntity<ArrayList<Transaction>> findAll(){
-        return ResponseEntity.ok(service.findAll());
+    public ResponseEntity<List<TransactionDTO>> findAll() {
+        List<Transaction> transactions = transactionService.findAll();
+        List<TransactionDTO> transactionDTOs = transactions.stream()
+            .map(transactionMapper::toDTO)
+            .collect(Collectors.toList());
+        return ResponseEntity.ok(transactionDTOs);
     }
 }

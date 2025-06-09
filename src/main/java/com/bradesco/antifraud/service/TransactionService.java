@@ -10,23 +10,26 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.bradesco.antifraud.model.Transaction;
 import com.bradesco.antifraud.repository.TransactionRepository;
+import com.bradesco.antifraud.mapper.TransactionMapper; // Importa o mapper
 
 import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class TransactionService {
-    
-    private TransactionRepository repository;
 
-    public TransactionService(TransactionRepository repository){
+    private final TransactionRepository repository; 
+    private final TransactionMapper transactionMapper; 
+
+    public TransactionService(TransactionRepository repository, TransactionMapper transactionMapper){
         this.repository = repository;
+        this.transactionMapper = transactionMapper;
     }
 
     public Transaction create(Transaction transaction){
         validate(transaction);
         return repository.save(transaction);
     }
-    
+
     public Optional<Transaction> findById(UUID id){
         return repository.findById(id);
     }
@@ -55,7 +58,7 @@ public class TransactionService {
         boolean hasSourceAccount = transaction.getContaDeOrigem() != null;
         boolean hasDestinationAccount = transaction.getContaDeDestino() != null;
         Transaction.TransactionType type = transaction.getTipo();
-    
+
         if (type == Transaction.TransactionType.DEPOSITO) {
             if (hasSourceAccount) {
                 throw conflict("Deposit should not have a source account.");
@@ -71,7 +74,7 @@ public class TransactionService {
             if (hasDestinationAccount) {
                 throw conflict("Withdrawal should not have a destination account.");
             }
-        }    
+        }
         else if (type == Transaction.TransactionType.TRANSFERENCIA) {
             if (!hasSourceAccount || !hasDestinationAccount) {
                 throw conflict("Transfer must have both source and destination accounts.");
@@ -81,9 +84,11 @@ public class TransactionService {
             if (!hasSourceAccount) {
                 throw conflict("Payment must have a source account.");
             }
-        }         
+            if (hasDestinationAccount) {
+                throw conflict("Payment should not have a destination account.");
+            }
+        }
     }
-
     private ResponseStatusException conflict(String msg){
         return new ResponseStatusException(HttpStatus.CONFLICT, msg);
     }
