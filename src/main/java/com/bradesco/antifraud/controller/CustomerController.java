@@ -2,7 +2,9 @@ package com.bradesco.antifraud.controller;
 
 import com.bradesco.antifraud.dto.LoginRequest;
 import com.bradesco.antifraud.model.Customer;
+import com.bradesco.antifraud.model.EmailRequest;
 import com.bradesco.antifraud.service.CustomerService;
+import com.bradesco.antifraud.service.EmailService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.SecureRandom;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,6 +24,8 @@ public class CustomerController {
 
     private final CustomerService customerService;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
+    private static final SecureRandom random = new SecureRandom();
 
     @GetMapping("/{id}")
     public ResponseEntity<Customer> getById(@PathVariable UUID id) {
@@ -57,6 +62,15 @@ public class CustomerController {
         if (customer == null || !passwordEncoder.matches(request.password(), customer.getPassword())) {
             return ResponseEntity.status(401).body("Email ou senha inválidos");
         }
+
+        String token = String.format("%06d", random.nextInt(1_000_000));
+
+        EmailRequest emailRequest = EmailRequest.builder()
+            .senderAddress(request.email())
+            .subject("Confirmação de Login: " + token.toString())
+            .build();
+
+        emailService.sendEmail(emailRequest);
         return ResponseEntity.ok(customer);
     }
 }
