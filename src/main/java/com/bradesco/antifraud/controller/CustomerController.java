@@ -3,9 +3,11 @@ package com.bradesco.antifraud.controller;
 import com.bradesco.antifraud.dto.LoginRequest;
 import com.bradesco.antifraud.model.Customer;
 import com.bradesco.antifraud.model.EmailRequest;
+import com.bradesco.antifraud.service.AccessLogService;
 import com.bradesco.antifraud.service.CustomerService;
 import com.bradesco.antifraud.service.EmailService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -25,6 +27,7 @@ public class CustomerController {
     private final CustomerService customerService;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
+    private final AccessLogService accessLogService;
     private static final SecureRandom random = new SecureRandom();
 
     @GetMapping("/{id}")
@@ -57,7 +60,7 @@ public class CustomerController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody @Valid LoginRequest request) {
+    public ResponseEntity<?> login(@RequestBody @Valid LoginRequest request, HttpServletRequest httpRequest) {
         Customer customer = customerService.findByEmail(request.email());
         if (customer == null || !passwordEncoder.matches(request.password(), customer.getPassword())) {
             return ResponseEntity.status(401).body("Email ou senha inválidos");
@@ -66,11 +69,14 @@ public class CustomerController {
         String token = String.format("%06d", random.nextInt(1_000_000));
 
         EmailRequest emailRequest = EmailRequest.builder()
-            .senderAddress(request.email())
-            .subject("Confirmação de Login: " + token.toString())
-            .build();
+                .senderAddress(request.email())
+                .subject("Confirmação de Login: " + token.toString())
+                .build();
 
         emailService.sendEmail(emailRequest);
+
+        accessLogService.createLog(customer.getId(), httpRequest, "LOGIN");
+
         return ResponseEntity.ok(customer);
     }
 }

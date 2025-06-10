@@ -19,14 +19,14 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AccessLogController {
 
-private final AccessLogService accessLogService;
+    private final AccessLogService accessLogService;
 
-@GetMapping("/{id}")
-public ResponseEntity<AccessLog> getById(@PathVariable UUID id) {
-    return ResponseEntity.ok(accessLogService.findById(id));
+    @GetMapping("/{id}")
+    public ResponseEntity<AccessLog> getById(@PathVariable UUID id) {
+        return ResponseEntity.ok(accessLogService.findById(id));
     }
 
-@PostMapping
+    @PostMapping
     public ResponseEntity<?> create(@RequestParam(required = false) UUID customerId, HttpServletRequest request) {
         if (customerId == null) {
             return ResponseEntity
