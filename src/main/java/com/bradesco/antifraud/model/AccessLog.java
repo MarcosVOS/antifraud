@@ -16,7 +16,7 @@ import java.util.UUID;
 public class AccessLog {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
     @NotBlank(message = "Action is required")
@@ -33,4 +33,9 @@ public class AccessLog {
     private String userAgent;
     private String path;
     private LocalDateTime accessTime;
+
+    private String ipAddress;
+    private String sessionId;
+    private String status;
+    private String httpMethod;
 }
