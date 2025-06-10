@@ -31,23 +31,52 @@ public class AccessLogService {
     }
 
     public AccessLog createLog(UUID customerId, HttpServletRequest request) {
-    Customer customer = customerService.findById(customerId);
+        Customer customer = customerService.findById(customerId);
 
-    String userAgent = request.getHeader("User-Agent");
-    String path = request.getRequestURI();
-    LocalDateTime accessTime = LocalDateTime.now();
+        String userAgent = request.getHeader("User-Agent");
+        String path = request.getRequestURI();
+        LocalDateTime accessTime = LocalDateTime.now();
 
-    AccessLog log = AccessLog.builder()
-            .customer(customer)
-            .userAgent(userAgent)
-            .path(path)
-            .accessTime(accessTime)
-            .build();
+        AccessLog log = AccessLog.builder()
+                .customer(customer)
+                .userAgent(userAgent)
+                .path(path)
+                .accessTime(accessTime)
+                .build();
 
-    return repository.save(log);
-}
+        return repository.save(log);
+    }
 
-public void deleteById(UUID id) {
+    public AccessLog createLog(UUID customerId, HttpServletRequest request, String action, String status) {
+        Customer customer = customerService.findById(customerId);
+
+        String userAgent = request.getHeader("User-Agent");
+        String path = request.getRequestURI();
+        String httpMethod = request.getMethod();
+        String sessionId = request.getSession(false) != null ? request.getSession(false).getId() : null;
+        String ipAddress = request.getHeader("X-Forwarded-For");
+        if (ipAddress == null) {
+            ipAddress = request.getRemoteAddr();
+        }
+        LocalDateTime now = LocalDateTime.now();
+
+        AccessLog log = AccessLog.builder()
+                .customer(customer)
+                .userAgent(userAgent)
+                .path(path)
+                .accessTime(now)
+                .action(action)
+                .timestamp(now)
+                .ipAddress(ipAddress)
+                .sessionId(sessionId)
+                .status(status)
+                .httpMethod(httpMethod)
+                .build();
+
+        return repository.save(log);
+    }
+
+    public void deleteById(UUID id) {
         AccessLog log = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Access log not found"));
         repository.delete(log);
