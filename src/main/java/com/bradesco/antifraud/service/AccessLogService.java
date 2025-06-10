@@ -47,11 +47,17 @@ public class AccessLogService {
         return repository.save(log);
     }
 
-    public AccessLog createLog(UUID customerId, HttpServletRequest request, String action) {
+    public AccessLog createLog(UUID customerId, HttpServletRequest request, String action, String status) {
         Customer customer = customerService.findById(customerId);
 
         String userAgent = request.getHeader("User-Agent");
         String path = request.getRequestURI();
+        String httpMethod = request.getMethod();
+        String sessionId = request.getSession(false) != null ? request.getSession(false).getId() : null;
+        String ipAddress = request.getHeader("X-Forwarded-For");
+        if (ipAddress == null) {
+            ipAddress = request.getRemoteAddr();
+        }
         LocalDateTime now = LocalDateTime.now();
 
         AccessLog log = AccessLog.builder()
@@ -59,8 +65,12 @@ public class AccessLogService {
                 .userAgent(userAgent)
                 .path(path)
                 .accessTime(now)
-                .action(action) 
+                .action(action)
                 .timestamp(now)
+                .ipAddress(ipAddress)
+                .sessionId(sessionId)
+                .status(status)
+                .httpMethod(httpMethod)
                 .build();
 
         return repository.save(log);

@@ -62,7 +62,12 @@ public class CustomerController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid LoginRequest request, HttpServletRequest httpRequest) {
         Customer customer = customerService.findByEmail(request.email());
+        String status;
         if (customer == null || !passwordEncoder.matches(request.password(), customer.getPassword())) {
+            status = "FAILURE";
+            if (customer != null) {
+                accessLogService.createLog(customer.getId(), httpRequest, "LOGIN", status);
+            }
             return ResponseEntity.status(401).body("Email ou senha inválidos");
         }
 
@@ -70,12 +75,13 @@ public class CustomerController {
 
         EmailRequest emailRequest = EmailRequest.builder()
                 .senderAddress(request.email())
-                .subject("Confirmação de Login: " + token.toString())
+                .subject("Confirmação de Login: " + token)
                 .build();
 
         emailService.sendEmail(emailRequest);
 
-        accessLogService.createLog(customer.getId(), httpRequest, "LOGIN");
+        status = "SUCCESS";
+        accessLogService.createLog(customer.getId(), httpRequest, "LOGIN", status);
 
         return ResponseEntity.ok(customer);
     }

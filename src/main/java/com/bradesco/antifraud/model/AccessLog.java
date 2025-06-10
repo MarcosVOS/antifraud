@@ -33,4 +33,9 @@ public class AccessLog {
     private String userAgent;
     private String path;
     private LocalDateTime accessTime;
+
+    private String ipAddress;
+    private String sessionId;
+    private String status;
+    private String httpMethod;
 }
