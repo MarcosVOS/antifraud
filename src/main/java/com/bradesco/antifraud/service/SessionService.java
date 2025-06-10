@@ -20,6 +20,14 @@ public class SessionService {
         return data != null && data.expiry.isAfter(LocalDateTime.now());
     }
 
+    public UUID getUserIdBySession(String sessionId) {
+        SessionData data = sessionStore.get(sessionId);
+        if (data == null || data.expiry.isBefore(LocalDateTime.now())) {
+            return null;
+        }
+        return data.userId;
+    }
+
     private static class SessionData {
         UUID userId;
         LocalDateTime expiry;
