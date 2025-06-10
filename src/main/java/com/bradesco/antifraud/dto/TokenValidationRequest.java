@@ -7,4 +7,5 @@ import lombok.Data;
 @Data
 public class TokenValidationRequest {
     private UUID token;
+    private String email;
 }

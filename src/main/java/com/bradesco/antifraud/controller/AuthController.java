@@ -26,6 +26,12 @@ import com.bradesco.antifraud.service.EmailService;
 import com.bradesco.antifraud.service.SessionService;
 import com.bradesco.antifraud.service.TokenService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -43,8 +49,15 @@ public class AuthController {
     private final SessionService sessionService;
     private static final SecureRandom random = new SecureRandom();
 
+    @Operation(summary = "User login", description = "Performs login and sends a verification token by email.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Token sent to email"),
+            @ApiResponse(responseCode = "401", description = "Invalid credentials", content = @Content)
+    })
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody @Valid LoginRequest request, HttpServletRequest httpRequest) {
+    public ResponseEntity<?> login(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "User login data", required = true, content = @Content(schema = @Schema(implementation = LoginRequest.class))) @RequestBody @Valid LoginRequest request,
+            HttpServletRequest httpRequest) {
         Customer customer = customerService.findByEmail(request.email());
         String status;
         if (customer == null || !passwordEncoder.matches(request.password(), customer.getPassword())) {
@@ -55,13 +68,13 @@ public class AuthController {
             return ResponseEntity.status(401).body("Invalid credentials");
         }
 
-        //String token = String.format("%06d", random.nextInt(1_000_000));
+        // String token = String.format("%06d", random.nextInt(1_000_000));
         String token = UUID.randomUUID().toString();
         tokenService.storeToken(token, customer.getId(), Duration.ofMinutes(15));
 
         EmailRequest emailRequest = EmailRequest.builder()
                 .senderAddress(request.email())
-                .subject("Confirmação de Login: " + token)
+                .subject("Login Confirmation: " + token)
                 .build();
 
         emailService.sendEmail(emailRequest);
@@ -72,30 +85,58 @@ public class AuthController {
         return ResponseEntity.ok("Verification token sent to email");
     }
 
+    @Operation(summary = "Verify login token", description = "Validates the token sent to the email and returns the session token.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Valid token, session created", content = @Content(schema = @Schema(implementation = LoginResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid or expired token", content = @Content)
+    })
     @PostMapping("/verify-token")
-    public ResponseEntity<LoginResponse> verifyToken(@RequestBody TokenValidationRequest request) {
+    public ResponseEntity<LoginResponse> verifyToken(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Verification token received by email", required = true, content = @Content(schema = @Schema(implementation = TokenValidationRequest.class))) @RequestBody TokenValidationRequest request,
+            HttpServletRequest httpRequest) {
         UUID userId = tokenService.validateAndConsumeToken(request.getToken());
         if (userId == null) {
-            accessLogService.createLog(null, null, "LOGIN", "FAILURE-TOKEN_INVALID");
+            accessLogService.createLog(null, httpRequest, "LOGIN", "FAILURE-TOKEN_INVALID");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+
+        Customer customer = customerService.findByEmail(request.getEmail());
+        if (customer == null || !customer.getId().equals(userId)) {
+            accessLogService.createLog(userId, httpRequest, "LOGIN", "FAILURE-EMAIL_MISMATCH");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
 
         String sessionUuid = UUID.randomUUID().toString();
         sessionService.storeSession(sessionUuid, userId);
 
-        accessLogService.createLog(userId, null, "LOGIN", "SUCCESS-TOKEN_VALIDATED");
+        accessLogService.createLog(userId, httpRequest, "LOGIN", "SUCCESS-TOKEN_VALIDATED");
         return ResponseEntity.ok(new LoginResponse(sessionUuid));
     }
 
+    @Operation(summary = "Get user session", description = "Returns information about the authenticated user by session.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Session found and valid"),
+            @ApiResponse(responseCode = "404", description = "Session not found or expired", content = @Content)
+    })
     @GetMapping("/session/{sessionToken}")
-    public ResponseEntity<?> getSession(@PathVariable String sessionToken, HttpServletRequest httpRequest) {
+    public ResponseEntity<?> getSession(
+            @Parameter(description = "Session token", required = true) @PathVariable String sessionToken,
+            HttpServletRequest httpRequest) {
         UUID userId = sessionService.getUserIdBySession(sessionToken);
         if (userId == null) {
             accessLogService.createLog(userId, httpRequest, "LOGIN", "FAILURE-SESSION_NOT_FOUND");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sessão não encontrada ou expirada");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Session not found or expired");
+        }
+
+        Customer customer;
+        try {
+            customer = customerService.findById(userId);
+        } catch (Exception e) {
+            accessLogService.createLog(userId, httpRequest, "LOGIN", "FAILURE-USER_NOT_FOUND");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
 
         accessLogService.createLog(userId, httpRequest, "LOGIN", "SUCCESS-SESSION_FOUND");
-        return ResponseEntity.ok().body(customerService.findById(userId));
+        return ResponseEntity.ok().body(customer);
     }
 }
