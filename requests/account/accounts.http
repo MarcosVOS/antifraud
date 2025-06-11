@@ -1,22 +1,26 @@
-### GET request to example server
-GET https://examples.http-client.intellij.net/get
-    ?generated-in=IntelliJ IDEA
-
-### Request to get an account by ID
+# =============================
+# Buscar conta por ID
+# =============================
 GET http://localhost:8080/accounts/{id}
-###Output: 200 OK
-#{
-    "id": "uuid-da-conta",
-    "numeroConta": "123456",
-    "agencia": "0001",
-    "saldo": 1000.00,
-    "tipoConta": "CORRENTE",
-    "status": "ATIVA",
-    "customerId": "uuid-do-usuario"
-    }
-### Request to create a new account
+Accept: application/json
+
+### Exemplo de resposta: 200 OK
+# {
+#   "id": "uuid-da-conta",
+#   "numeroConta": "123456",
+#   "agencia": "0001",
+#   "saldo": 1000.00,
+#   "tipoConta": "CORRENTE",
+#   "status": "ATIVA",
+#   "customerId": "uuid-do-usuario"
+# }
+
+# =============================
+# Criar uma nova conta
+# =============================
 POST http://localhost:8080/accounts/newaccount
 Content-Type: application/json
+Accept: application/json
 
 {
   "numeroConta": "123456",
@@ -26,20 +30,25 @@ Content-Type: application/json
   "status": "ATIVA",
   "customerId": "uuid-do-usuario"
 }
-###Output: 201 Created
-#{
-  "id": "uuid-da-conta-criada",
-  "numeroConta": "123456",
-  "agencia": "0001",
-  "saldo": 1000.00,
-  "tipoConta": "CORRENTE",
-  "status": "ATIVA",
-  "customerId": "uuid-do-usuario"
-  }
 
-### Request to update an account by ID
+### Exemplo de resposta: 201 Created
+# {
+#   "id": "uuid-da-conta-criada",
+#   "numeroConta": "123456",
+#   "agencia": "0001",
+#   "saldo": 1000.00,
+#   "tipoConta": "CORRENTE",
+#   "status": "ATIVA",
+#   "customerId": "uuid-do-usuario"
+# }
+
+# =============================
+# Atualizar conta por ID
+# =============================
 PUT http://localhost:8080/accounts/updateAccount/{id}
 Content-Type: application/json
+Accept: application/json
+
 {
   "numeroConta": "123456",
   "agencia": "0001",
@@ -48,5 +57,50 @@ Content-Type: application/json
   "status": "ATIVA",
   "customerId": "uuid-do-usuario"
 }
-### Request to delete an account by ID
+
+### Exemplo de resposta: 200 OK
+# {
+#   "id": "uuid-da-conta",
+#   "numeroConta": "123456",
+#   "agencia": "0001",
+#   "saldo": 1500.00,
+#   "tipoConta": "POUPANCA",
+#   "status": "ATIVA",
+#   "customerId": "uuid-do-usuario"
+# }
+
+# =============================
+# Deletar conta por ID
+# =============================
 DELETE http://localhost:8080/accounts/deleteAccount/{id}
+Accept: application/json
+
+### Exemplo de resposta: 204 No Content
+
+# =============================
+# Listar todas as contas
+# =============================
+GET http://localhost:8080/accounts
+Accept: application/json
+
+### Exemplo de resposta: 200 OK
+# [
+#   {
+#     "id": "uuid-da-conta1",
+#     "numeroConta": "123456",
+#     "agencia": "0001",
+#     "saldo": 1000.00,
+#     "tipoConta": "CORRENTE",
+#     "status": "ATIVA",
+#     "customerId": "uuid-do-usuario1"
+#   },
+#   {
+#     "id": "uuid-da-conta2",
+#     "numeroConta": "654321",
+#     "agencia": "0002",
+#     "saldo": 500.00,
+#     "tipoConta": "POUPANCA",
+#     "status": "INATIVA",
+#     "customerId": "uuid-do-usuario2"
+#   }
+# ]
