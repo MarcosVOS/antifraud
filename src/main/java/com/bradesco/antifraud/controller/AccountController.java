@@ -26,6 +26,7 @@ class AccountController {
 
     private final AccountMapper accountMapper;
 
+
     @GetMapping("/{id}")
 public ResponseEntity<AccountDto> getAccountByID(@PathVariable String id) {
     return accountService.getAccountById(UUID.fromString(id))

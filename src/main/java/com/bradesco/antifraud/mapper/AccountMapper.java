@@ -8,7 +8,7 @@ import org.mapstruct.*;
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING, uses = {CustomerMapper.class})
 public interface AccountMapper {
 
-    @Mapping(target = "id", ignore = true)
+    //@Mapping(target = "id", ignore = true)
     @Mapping(target = "customer", ignore = true)
     Account toEntity(AccountDto accountDto);
 

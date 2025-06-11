@@ -27,6 +27,7 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
+    @NotNull
     @Column(unique = true)
     private String accountNumber;
 
@@ -35,8 +36,6 @@ public class Account {
 
     @NotNull
     private BigDecimal balance;
-
-
 
     @Enumerated(EnumType.STRING)
     private AccountType accountType;
@@ -48,6 +47,6 @@ public class Account {
     @JoinColumn(name = "customers_id", nullable = false)
     Customer customer;
 
-    public enum AccountType {CORRENTE, POUPANCA, INVESTIMENTO}
-    public enum AccountStatus {ATIVA, INATIVA, BLOQUADA, ENCERRADA}
+    public enum AccountType {CORRENTE,POUPANCA,INVESTIMENTO}
+    public enum AccountStatus {ATIVA,INATIVA, BLOQUADA,ENCERRADA}
 }

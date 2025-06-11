@@ -3,8 +3,6 @@ package com.bradesco.antifraud.dto;
 import com.bradesco.antifraud.model.Account;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -29,17 +27,15 @@ public class AccountDto implements Serializable {
     @JsonProperty("account_number")
     String accountNumber;
 
-    @NotNull
+
     @JsonProperty("agency")
-    @NotNull(message = "Agency cannot be null")
     String agency;
 
-    @NotNull
+
     @JsonProperty("balance")
     BigDecimal balance;
 
     @JsonProperty("account_type")
-    @NotBlank
     Account.AccountType accountType;
 
     @JsonProperty("account_status")
