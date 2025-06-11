@@ -1,7 +1,7 @@
 package com.bradesco.antifraud.controller;
 
-import com.bradesco.antifraud.dto.AccountDTO;
-
+import com.bradesco.antifraud.dto.AccountDto;
+import com.bradesco.antifraud.dto.CreateAccountDTO;
 import com.bradesco.antifraud.mapper.AccountMapper;
 import com.bradesco.antifraud.model.Account;
 import com.bradesco.antifraud.service.AccountService;
@@ -27,30 +27,30 @@ class AccountController {
     private final AccountMapper accountMapper;
 
     @GetMapping("/{id}")
-public ResponseEntity<AccountDTO> getAccountByID(@PathVariable String id) {
+public ResponseEntity<AccountDto> getAccountByID(@PathVariable String id) {
     return accountService.getAccountById(UUID.fromString(id))
-            .map(accountMapper::toDTO)
+            .map(accountMapper::toDto)
             .map(ResponseEntity::ok)
             .orElseGet(() -> ResponseEntity.notFound().build());
 }
     //Create a new Account
     @PostMapping("/newaccount")
-public ResponseEntity<AccountDTO> createAccount(@RequestBody @Valid AccountDTO accountDTO) {
-        
-        Account accountEntity = accountMapper.toEntity(accountDTO);
+public ResponseEntity<CreateAccountDTO> createAccount(@RequestBody AccountDto newAccountDTO) {
+        // Ensure the ID is null for creation
 
-        Account createdAccount = accountService.createAccount(accountEntity);
-        AccountDTO createdAccountDTO = accountMapper.toDTO(createdAccount);
+        Account newAccount = accountService.createAccount(newAccountDTO);
+        CreateAccountDTO newAccountDto = accountMapper.newAccounttoDto(newAccount);
 
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequestUri()
                 .path("/{id}")
-                .buildAndExpand(createdAccountDTO.getId())
+                .buildAndExpand(newAccountDTO.getId())
                 .toUri();
 
-        return ResponseEntity.created(location).body(createdAccountDTO);
+        return ResponseEntity.created(location).body(newAccountDto);
 }
+
     //Delete an Account
     @DeleteMapping("/deleteAccount/{id}")
 public ResponseEntity<Void> deleteAccount(@PathVariable String id) {
@@ -64,11 +64,11 @@ public ResponseEntity<Void> deleteAccount(@PathVariable String id) {
 
     //Update an account
     @PutMapping("/updateAccount/{id}")
-public ResponseEntity<AccountDTO> updateAccount(@PathVariable String id, @RequestBody @Valid AccountDTO accountDTO) {
+public ResponseEntity<AccountDto> updateAccount(@PathVariable String id, @RequestBody @Valid AccountDto accountDTO) {
     UUID accountId = UUID.fromString(id);
  
     Account updatedAccount = accountService.updateAccount(accountId, accountDTO);
-    AccountDTO updatedAccountDTO = accountMapper.toDTO(updatedAccount);
+    AccountDto updatedAccountDTO = accountMapper.toDto(updatedAccount);
     
     return ResponseEntity.ok(updatedAccountDTO);
 }
