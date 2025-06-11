@@ -2,7 +2,7 @@
 
 package com.bradesco.antifraud.controller;
 
-import com.bradesco.antifraud.dto.AccountDTO;
+import com.bradesco.antifraud.dto.AccountDto;
 import com.bradesco.antifraud.mapper.AccountMapper;
 
 import com.bradesco.antifraud.model.Account;
@@ -14,6 +14,7 @@ import com.bradesco.antifraud.model.Customer;
 import com.bradesco.antifraud.service.AccountService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@Slf4j
 @WebMvcTest(AccountController.class)
 @AutoConfigureMockMvc(addFilters = false)
 class AccountControllerTest {
@@ -44,13 +46,14 @@ class AccountControllerTest {
     @MockitoBean
     private AccountService accountService;
 
-    @MockitoBean
+    @Autowired
     private AccountMapper accountMapper;
     @Autowired
     private ObjectMapper objectMapper;
 
     UUID generatedId = UUID.randomUUID();
     UUID customerId = UUID.randomUUID();
+
     private Customer createMockCustomer(UUID customerId) {
         Address address = Address.builder()
                 .street("Main St")
@@ -86,18 +89,18 @@ class AccountControllerTest {
                 .accountStatus(AccountStatus.ATIVA)
                 .customer(createMockCustomer(customerId))
                 .build();
-        AccountDTO dto = AccountDTO.builder()
+        AccountDto dto = AccountDto.builder()
                 .id(id)
                 .accountNumber("12345")
                 .agency("001")
                 .balance(BigDecimal.TEN)
                 .accountType(Account.AccountType.CORRENTE)
                 .accountStatus(Account.AccountStatus.ATIVA)
-                .customerId(customerId)
+                //.customerId(customerId)
                 .build();
 
         Mockito.when(accountService.getAccountById(id)).thenReturn(Optional.of(account));
-        Mockito.when(accountMapper.toDTO(account)).thenReturn(dto);
+        Mockito.when(accountMapper.toDto(account)).thenReturn(dto);
 
 
         mockMvc.perform(get("/accounts/"+ id))
@@ -123,13 +126,13 @@ class AccountControllerTest {
     void createAccount_returnsCreated() throws Exception {
 
         // Mockando um ID de cliente, se necessário
-        AccountDTO requestDto = AccountDTO.builder()
+        AccountDto requestDto = AccountDto.builder()
                 .accountNumber("67890")
                 .agency("002")
                 .balance(new BigDecimal("100.50"))
                 .accountType(AccountType.POUPANCA)
                 .accountStatus(AccountStatus.ATIVA)
-                .customerId(createMockCustomer(customerId).getId())
+                .customerId(customerId)
                 .build();
 
         Account accountEntityToCreate = Account.builder()
@@ -151,19 +154,19 @@ class AccountControllerTest {
                 .customer(createMockCustomer(customerId))
                 .build();
 
-        AccountDTO responseDto = AccountDTO.builder()
+        AccountDto responseDto = AccountDto.builder()
                 .id(generatedId)
                 .accountNumber("67890")
                 .agency("002")
                 .balance(new BigDecimal("100.50"))
                 .accountType(AccountType.POUPANCA)
                 .accountStatus(AccountStatus.ATIVA)
-                .customerId(createMockCustomer(generatedId).getId())
+                .customerId(generatedId)
                 .build();
 
-        Mockito.when(accountMapper.toEntity(any(AccountDTO.class))).thenReturn(accountEntityToCreate);
-        Mockito.when(accountService.createAccount(any(Account.class))).thenReturn(createdAccountEntity);
-        Mockito.when(accountMapper.toDTO(any(Account.class))).thenReturn(responseDto);
+        Mockito.when(accountMapper.toEntity(any(AccountDto.class))).thenReturn(accountEntityToCreate);
+        Mockito.when(accountService.createAccount(any(AccountDto.class))).thenReturn(createdAccountEntity);
+        Mockito.when(accountMapper.toDto(any(Account.class))).thenReturn(responseDto);
 
         mockMvc.perform(post("/accounts/newaccount")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -175,6 +178,8 @@ class AccountControllerTest {
                 .andExpect(jsonPath("$.agency").value("002"))
                 .andExpect(jsonPath("$.balance").value(100.50))
                 .andExpect(jsonPath("$.accountType").value(AccountType.POUPANCA.toString()))
-                .andExpect(jsonPath("$.accountStatus").value(AccountStatus.ATIVA.toString()));
+                .andExpect(jsonPath("$.accountStatus").value(AccountStatus.ATIVA.toString()))
+                .andExpect(jsonPath("$.customerId").value(customerId.toString()));
+
     }
 }
