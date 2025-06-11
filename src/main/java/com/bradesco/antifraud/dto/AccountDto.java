@@ -22,6 +22,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class AccountDto implements Serializable {
 
+    @JsonProperty("id")
     private UUID id;
 
     @JsonProperty("account_number")
