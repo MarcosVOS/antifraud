@@ -11,7 +11,7 @@ import com.bradesco.antifraud.repository.CustomerRepository;
 import jakarta.persistence.EntityNotFoundException;
 
 
-import org.jetbrains.annotations.NotNull;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -74,12 +74,20 @@ public class AccountService {
             throw new AccountAlreadyExistsException("Account with number " + updatedAccountData.getAccountNumber() + " already exists.");
         }
 
-        // Atualizar campos da existingAccount com updatedAccountData
-        existingAccount.setAccountNumber(updatedAccountData.getAccountNumber());
+
+
+        if (updatedAccountData.getAgency() != null) {
         existingAccount.setAgency(updatedAccountData.getAgency());
+    }
+        if (updatedAccountData.getBalance() != null) {
         existingAccount.setBalance(updatedAccountData.getBalance());
+    }
+        if (updatedAccountData.getAccountType() != null) {
         existingAccount.setAccountType(updatedAccountData.getAccountType());
+    }
+        if (updatedAccountData.getAccountStatus() != null) {
         existingAccount.setAccountStatus(updatedAccountData.getAccountStatus());
+    }
 
 
         return accountRepository.save(existingAccount);
