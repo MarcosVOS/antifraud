@@ -1,7 +1,10 @@
-### GET All Transactions
+# =============================
+# Listar todas as transações
+# =============================
 GET http://localhost:8080/transactions
 Accept: application/json
-### Output: 200 OK
+
+### Exemplo de resposta: 200 OK
 # [
 #   {
 #     "id": "uuid-da-transacao-1",
@@ -23,10 +26,13 @@ Accept: application/json
 #   }
 # ]
 
-### GET Transaction by ID
-GET http://localhost:8080/transactions/{id-da-transacao}
+# =============================
+# Buscar transação por ID
+# =============================
+GET http://localhost:8080/transactions/{id}
 Accept: application/json
-### Output: 200 OK
+
+### Exemplo de resposta: 200 OK
 # {
 #   "id": "uuid-da-transacao",
 #   "tipo": "DEPOSITO",
@@ -37,20 +43,20 @@ Accept: application/json
 #   "contaDeDestino": "uuid-da-conta-destino"
 # }
 
-### GET Transaction by ID - Not Found
-GET http://localhost:8080/transactions/00000000-0000-0000-0000-000000000000
-Accept: application/json
-### Output: 404 Not Found
+### Exemplo de resposta: 404 Not Found
 # {
 #   "status": 404,
 #   "error": "Not Found",
 #   "message": "Transação não encontrada.",
-#   "path": "/transactions/00000000-0000-0000-0000-000000000000"
+#   "path": "/transactions/{id}"
 # }
 
-### POST Create Transaction - DEPOSITO
+# =============================
+# Criar nova transação - DEPOSITO
+# =============================
 POST http://localhost:8080/transactions
 Content-Type: application/json
+Accept: application/json
 
 {
   "tipo": "DEPOSITO",
@@ -60,7 +66,8 @@ Content-Type: application/json
   "contaDeOrigem": null,
   "contaDeDestino": "uuid-da-conta-destino-valida"
 }
-### Output: 201 Created
+
+### Exemplo de resposta: 201 Created
 # {
 #   "id": "uuid-da-transacao-criada",
 #   "tipo": "DEPOSITO",
@@ -71,9 +78,12 @@ Content-Type: application/json
 #   "contaDeDestino": "uuid-da-conta-destino-valida"
 # }
 
-### POST Create Transaction - SAQUE
+# =============================
+# Criar nova transação - SAQUE
+# =============================
 POST http://localhost:8080/transactions
 Content-Type: application/json
+Accept: application/json
 
 {
   "tipo": "SAQUE",
@@ -83,7 +93,8 @@ Content-Type: application/json
   "contaDeOrigem": "uuid-da-conta-origem-valida",
   "contaDeDestino": null
 }
-### Output: 201 Created
+
+### Exemplo de resposta: 201 Created
 # {
 #   "id": "uuid-da-transacao-criada",
 #   "tipo": "SAQUE",
@@ -94,9 +105,12 @@ Content-Type: application/json
 #   "contaDeDestino": null
 # }
 
-### POST Create Transaction - TRANSFERENCIA
+# =============================
+# Criar nova transação - TRANSFERENCIA
+# =============================
 POST http://localhost:8080/transactions
 Content-Type: application/json
+Accept: application/json
 
 {
   "tipo": "TRANSFERENCIA",
@@ -106,7 +120,8 @@ Content-Type: application/json
   "contaDeOrigem": "uuid-da-conta-origem-valida",
   "contaDeDestino": "uuid-da-conta-destino-valida"
 }
-### Output: 201 Created
+
+### Exemplo de resposta: 201 Created
 # {
 #   "id": "uuid-da-transacao-criada",
 #   "tipo": "TRANSFERENCIA",
@@ -117,9 +132,12 @@ Content-Type: application/json
 #   "contaDeDestino": "uuid-da-conta-destino-valida"
 # }
 
-### POST Create Transaction - PAGAMENTO
+# =============================
+# Criar nova transação - PAGAMENTO
+# =============================
 POST http://localhost:8080/transactions
 Content-Type: application/json
+Accept: application/json
 
 {
   "tipo": "PAGAMENTO",
@@ -129,7 +147,8 @@ Content-Type: application/json
   "contaDeOrigem": "uuid-da-conta-origem-valida",
   "contaDeDestino": null
 }
-### Output: 201 Created
+
+### Exemplo de resposta: 201 Created
 # {
 #   "id": "uuid-da-transacao-criada",
 #   "tipo": "PAGAMENTO",
@@ -140,10 +159,64 @@ Content-Type: application/json
 #   "contaDeDestino": null
 # }
 
+# =============================
+# Atualizar transação por ID
+# =============================
+PUT http://localhost:8080/transactions/{id}
+Content-Type: application/json
+Accept: application/json
 
-### POST Create Transaction - Invalid Data (Valor Nulo)
+{
+  "tipo": "DEPOSITO",
+  "valor": 175.50,
+  "dataHora": "2025-06-08T17:00:00",
+  "descricao": "Depósito de salário mensal - Atualizado",
+  "contaDeOrigem": null,
+  "contaDeDestino": "uuid-da-conta-destino-valida"
+}
+
+### Exemplo de resposta: 200 OK
+# {
+#   "id": "id-da-transacao-existente",
+#   "tipo": "DEPOSITO",
+#   "valor": 175.50,
+#   "dataHora": "2025-06-08T17:00:00",
+#   "descricao": "Depósito de salário mensal - Atualizado",
+#   "contaDeOrigem": null,
+#   "contaDeDestino": "uuid-da-conta-destino-valida"
+# }
+
+### Exemplo de resposta: 404 Not Found
+# {
+#   "status": 404,
+#   "error": "Not Found",
+#   "message": "Transação não encontrada.",
+#   "path": "/transactions/{id}"
+# }
+
+# =============================
+# Deletar transação por ID
+# =============================
+DELETE http://localhost:8080/transactions/{id}
+Accept: application/json
+
+### Exemplo de resposta: 204 No Content
+
+### Exemplo de resposta: 404 Not Found
+# {
+#   "status": 404,
+#   "error": "Not Found",
+#   "message": "Transação não encontrada.",
+#   "path": "/transactions/{id}"
+# }
+
+# =============================
+# Exemplos de erros de validação e regras de negócio
+# =============================
+# Valor nulo
 POST http://localhost:8080/transactions
 Content-Type: application/json
+Accept: application/json
 
 {
   "tipo": "DEPOSITO",
@@ -153,7 +226,8 @@ Content-Type: application/json
   "contaDeOrigem": null,
   "contaDeDestino": "uuid-da-conta-destino-valida"
 }
-### Output: 400 Bad Request
+
+### Exemplo de resposta: 400 Bad Request
 # {
 #   "timestamp": "2025-06-08T15:00:00.000+00:00",
 #   "status": 400,
@@ -167,9 +241,10 @@ Content-Type: application/json
 #   ]
 # }
 
-### POST Create Transaction - Invalid Data (Tipo Incorreto)
+# Tipo incorreto
 POST http://localhost:8080/transactions
 Content-Type: application/json
+Accept: application/json
 
 {
   "tipo": "TIPO_INVALIDO",
@@ -179,7 +254,8 @@ Content-Type: application/json
   "contaDeOrigem": null,
   "contaDeDestino": "uuid-da-conta-destino-valida"
 }
-### Output: 400 Bad Request
+
+### Exemplo de resposta: 400 Bad Request
 # {
 #   "timestamp": "2025-06-08T15:05:00.000+00:00",
 #   "status": 400,
@@ -188,9 +264,10 @@ Content-Type: application/json
 #   "path": "/transactions"
 # }
 
-### POST Create Transaction - Rule Violation (DEPOSITO com conta de origem)
+# Regra: Depósito com conta de origem
 POST http://localhost:8080/transactions
 Content-Type: application/json
+Accept: application/json
 
 {
   "tipo": "DEPOSITO",
@@ -200,7 +277,8 @@ Content-Type: application/json
   "contaDeOrigem": "uuid-da-conta-origem-valida",
   "contaDeDestino": "uuid-da-conta-destino-valida"
 }
-### Output: 409 Conflict
+
+### Exemplo de resposta: 409 Conflict
 # {
 #   "timestamp": "2025-06-08T16:00:00.000+00:00",
 #   "status": 409,
@@ -209,19 +287,18 @@ Content-Type: application/json
 #   "path": "/transactions"
 # }
 
-### POST Create Transaction - Rule Violation (SAQUE sem conta de origem)
+# Regra: Saque sem conta de origem
 POST http://localhost:8080/transactions
 Content-Type: application/json
+Accept: application/json
 
 {
   "tipo": "SAQUE",
   "valor": 50.00,
-  "dataHora": "2025-06-08T16:15:00",
-  "descricao": "Saque sem conta de origem (erro)",
-  "contaDeOrigem": null,
-  "contaDeDestino": null
+  "dataHora": "2025-06-08T16:15:00"
 }
-### Output: 409 Conflict
+
+### Exemplo de resposta: 409 Conflict
 # {
 #   "timestamp": "2025-06-08T16:15:00.000+00:00",
 #   "status": 409,
@@ -230,19 +307,21 @@ Content-Type: application/json
 #   "path": "/transactions"
 # }
 
-### POST Create Transaction - Rule Violation (TRANSFERENCIA com contas iguais)
+# Regra: Transferência com contas iguais
 POST http://localhost:8080/transactions
 Content-Type: application/json
+Accept: application/json
 
 {
   "tipo": "TRANSFERENCIA",
-  "valor": 10.00,
+  "valor": 200.00,
   "dataHora": "2025-06-08T16:30:00",
-  "descricao": "Transferência para a mesma conta (erro)",
-  "contaDeOrigem": "uuid-da-conta-origem-valida",
-  "contaDeDestino": "uuid-da-conta-origem-valida"
+  "descricao": "Transferência com contas iguais",
+  "contaDeOrigem": "uuid-da-conta-igual",
+  "contaDeDestino": "uuid-da-conta-igual"
 }
-### Output: 409 Conflict
+
+### Exemplo de resposta: 409 Conflict
 # {
 #   "timestamp": "2025-06-08T16:30:00.000+00:00",
 #   "status": 409,
@@ -251,110 +330,25 @@ Content-Type: application/json
 #   "path": "/transactions"
 # }
 
-### PUT Update Transaction
-PUT http://localhost:8080/transactions/{id-da-transacao-existente}
-Content-Type: application/json
-
-{
-  "id": "id-da-transacao-existente",
-  "tipo": "DEPOSITO",
-  "valor": 175.50,
-  "dataHora": "2025-06-08T17:00:00",
-  "descricao": "Depósito de salário mensal - Atualizado",
-  "contaDeOrigem": null,
-  "contaDeDestino": "uuid-da-conta-destino-valida"
-}
-### Output: 200 OK
-# {
-#   "id": "id-da-transacao-existente",
-#   "tipo": "DEPOSITO",
-#   "valor": 175.50,
-#   "dataHora": "2025-06-08T17:00:00",
-#   "descricao": "Depósito de salário mensal - Atualizado",
-#   "contaDeOrigem": null,
-#   "contaDeDestino": "uuid-da-conta-destino-valida"
-# }
-
-### PUT Update Transaction - Not Found
-PUT http://localhost:8080/transactions/00000000-0000-0000-0000-000000000000
-Content-Type: application/json
-
-{
-  "id": "00000000-0000-0000-0000-000000000000",
-  "tipo": "DEPOSITO",
-  "valor": 10.00,
-  "dataHora": "2025-06-08T17:15:00",
-  "descricao": "Tentativa de atualizar transação inexistente",
-  "contaDeOrigem": null,
-  "contaDeDestino": "uuid-da-conta-destino-valida"
-}
-### Output: 404 Not Found
-# {
-#   "status": 404,
-#   "error": "Not Found",
-#   "message": "Transação não encontrada.",
-#   "path": "/transactions/00000000-0000-0000-0000-000000000000"
-# }
-
-### PUT Update Transaction - Invalid Data (Valor Nulo)
-PUT http://localhost:8080/transactions/{id-da-transacao-existente}
-Content-Type: application/json
-
-{
-  "id": "id-da-transacao-existente",
-  "tipo": "DEPOSITO",
-  "valor": null,
-  "dataHora": "2025-06-08T17:30:00",
-  "descricao": "Atualização com valor nulo",
-  "contaDeOrigem": null,
-  "contaDeDestino": "uuid-da-conta-destino-valida"
-}
-### Output: 400 Bad Request
-# {
-#   "timestamp": "2025-06-08T17:30:00.000+00:00",
-#   "status": 400,
-#   "error": "Bad Request",
-#   "message": "Validation failed for object='transactionDTO'. Error count: 1",
-#   "errors": [
-#     {
-#       "field": "valor",
-#       "defaultMessage": "O valor da transação é obrigatório."
-#     }
-#   ]
-# }
-
-### PUT Update Transaction - Rule Violation (SAQUE com conta de destino na atualização)
+# Regra: Saque com conta de destino na atualização
 PUT http://localhost:8080/transactions/{id-de-saque-existente}
 Content-Type: application/json
+Accept: application/json
 
 {
-  "id": "id-de-saque-existente",
   "tipo": "SAQUE",
-  "valor": 70.00,
+  "valor": 80.00,
   "dataHora": "2025-06-08T17:45:00",
-  "descricao": "Saque com destino na atualização (erro)",
+  "descricao": "Saque com conta de destino (erro)",
   "contaDeOrigem": "uuid-da-conta-origem-valida",
-  "contaDeDestino": "uuid-da-conta-destino-valida"
+  "contaDeDestino": "uuid-da-conta-destino-nao-permitida"
 }
-### Output: 409 Conflict
+
+### Exemplo de resposta: 409 Conflict
 # {
 #   "timestamp": "2025-06-08T17:45:00.000+00:00",
 #   "status": 409,
 #   "error": "Conflict",
 #   "message": "Para saque, não deve haver conta de destino.",
 #   "path": "/transactions/{id-de-saque-existente}"
-# }
-
-### DELETE Transaction
-DELETE http://localhost:8080/transactions/{id-da-transacao-a-deletar}
-### Output: 204 No Content
-
-### DELETE Transaction - Not Found
-DELETE http://localhost:8080/transactions/00000000-0000-0000-0000-000000000000
-### Output: 404 Not Found
-# {
-#   "status": 404,
-#   "error": "Not Found",
-#   "message": "Transação não encontrada.",
-#   "path": "/transactions/00000000-0000-0000-0000-000000000000"
 # }
