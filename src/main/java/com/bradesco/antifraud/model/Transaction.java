@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.bradesco.antifraud.dto.AccountDto;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -11,8 +12,14 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
+@Builder
 public class Transaction {
     
     @Id
@@ -87,6 +94,20 @@ public class Transaction {
     }
     public void setContaDeDestino(Account contaDeDestino) {
         this.contaDeDestino = contaDeDestino;
+    }
+
+    public AccountDto getContaDeOrigemDto() {
+        AccountDto accountDto = AccountDto.builder()
+                .accountNumber(contaDeOrigem.getAccountNumber())
+                .accountStatus(contaDeOrigem.getAccountStatus())
+                .accountType(contaDeOrigem.getAccountType())
+                .balance(contaDeOrigem.getBalance())
+                .agency(contaDeOrigem.getAgency())
+                .customerId(contaDeOrigem.getCustomer().getId())
+                .build();
+
+        return accountDto;
+
     }
 
 }
