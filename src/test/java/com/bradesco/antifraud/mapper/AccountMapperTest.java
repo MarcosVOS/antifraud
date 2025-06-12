@@ -1,6 +1,6 @@
 package com.bradesco.antifraud.mapper;
 
-import com.bradesco.antifraud.dto.AccountDTO;
+import com.bradesco.antifraud.dto.AccountDto;
 import com.bradesco.antifraud.model.Account;
 import com.bradesco.antifraud.model.Account.AccountStatus;
 import com.bradesco.antifraud.model.Account.AccountType;
@@ -26,7 +26,7 @@ class AccountMapperTest {
         account.setAccountType(AccountType.CORRENTE);
         account.setAccountStatus(AccountStatus.ATIVA);
 
-        AccountDTO accountDTO = accountMapper.toDTO(account);
+        AccountDto accountDTO = accountMapper.toDto(account);
 
         assertEquals(account.getId(), accountDTO.getId());
         assertEquals(account.getAccountNumber(), accountDTO.getAccountNumber());
@@ -38,7 +38,7 @@ class AccountMapperTest {
 
     @Test
     void testToEntity() {
-        AccountDTO accountDTO = AccountDTO.builder()
+        AccountDto accountDTO = AccountDto.builder()
                 .id(UUID.randomUUID())
                 .accountNumber("12345")
                 .agency("001")
