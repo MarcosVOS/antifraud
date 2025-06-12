@@ -64,7 +64,7 @@ Accept: application/json
   "dataHora": "2025-06-08T10:00:00",
   "descricao": "Depósito de salário mensal",
   "contaDeOrigem": null,
-  "contaDeDestino": "uuid-da-conta-destino-valida"
+  "contaDeDestino": "a1b2c3d4-e5f6-7890-1234-567890abcdef"
 }
 
 ### Exemplo de resposta: 201 Created
@@ -352,3 +352,24 @@ Accept: application/json
 #   "message": "Para saque, não deve haver conta de destino.",
 #   "path": "/transactions/{id-de-saque-existente}"
 # }
+
+# =============================
+# Criar nova conta
+# =============================
+POST http://localhost:8080/accounts/newaccount
+Content-Type: application/json
+Accept: application/json
+
+{
+  "accountNumber": "001",
+  "agency": "0001",
+  "balance": 1000.00,
+  "accountType": "CORRENTE",
+  "accountStatus": "ATIVA",
+}
+
+# =============================
+# Listar todas as contas (opcional, para verificar)
+# =============================
+GET http://localhost:8080/accounts
+Accept: application/json

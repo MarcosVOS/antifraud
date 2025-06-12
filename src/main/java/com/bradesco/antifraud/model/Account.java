@@ -1,9 +1,6 @@
 package com.bradesco.antifraud.model;
 
-
-
 import jakarta.persistence.*;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -20,7 +17,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-
 public class Account {
 
     @Id
@@ -36,19 +32,18 @@ public class Account {
     @NotNull
     private BigDecimal balance;
 
-
-    @NotBlank
+    @NotNull // Corrigido de @NotBlank para @NotNull para Enums
     @Enumerated(EnumType.STRING)
     private AccountType accountType;
 
-    @NotBlank
+    @NotNull // Corrigido de @NotBlank para @NotNull para Enums
     @Enumerated(EnumType.STRING)
     private AccountStatus accountStatus;
 
-    @ManyToOne(fetch =  FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", nullable = false)
     Customer customer;
 
     public enum AccountType {CORRENTE, POUPANCA, INVESTIMENTO}
-    public enum AccountStatus {ATIVA, INATIVA, BLOQUADA, ENCERRADA}
+    public enum AccountStatus {ATIVA, INATIVA, BLOQUEADA, ENCERRADA}
 }

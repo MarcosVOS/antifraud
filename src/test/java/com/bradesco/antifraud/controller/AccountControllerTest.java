@@ -34,8 +34,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+// Importações para assertThrows e ResponseStatusException, se não estiverem presentes, adicione:
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.springframework.web.server.ResponseStatusException;
+
+
 @WebMvcTest(AccountController.class)
-@AutoConfigureMockMvc(addFilters = false)
+@AutoConfigureMockMvc(addFilters = false) // Mantenha isso se você está desabilitando a segurança para testes
 class AccountControllerTest {
 
     @Autowired
@@ -64,9 +69,9 @@ class AccountControllerTest {
         return Customer.builder()
                 .id(customerId)
                 .name("John Doe")
-                .cpf("12345678909") // Use a valid CPF generator for real tests if needed
+                .cpf("12345678909")
                 .dateOfBirth(LocalDate.of(1990, 1, 1))
-                .email("john.doe@example.com") // Valid email
+                .email("john.doe@example.com")
                 .phone("+5511999998888")
                 .address(address)
                 .password("securePassword123")
@@ -96,16 +101,16 @@ class AccountControllerTest {
                 .customerId(customerId)
                 .build();
 
-        Mockito.when(accountService.getAccountById(id)).thenReturn(Optional.of(account));
+        // CORREÇÃO: Mudar o método mockado de getAccountById para findById
+        Mockito.when(accountService.findById(id)).thenReturn(Optional.of(account));
         Mockito.when(accountMapper.toDTO(account)).thenReturn(dto);
-
 
         mockMvc.perform(get("/accounts/"+ id))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(id.toString()))
                 .andExpect(jsonPath("$.accountNumber").value("12345"))
                 .andExpect(jsonPath("$.agency").value("001"))
-                .andExpect(jsonPath("$.balance").value(BigDecimal.TEN.doubleValue())) // Para BigDecimal, compare o valor double
+                .andExpect(jsonPath("$.balance").value(BigDecimal.TEN.doubleValue()))
                 .andExpect(jsonPath("$.accountType").value(AccountType.CORRENTE.toString()))
                 .andExpect(jsonPath("$.accountStatus").value(AccountStatus.ATIVA.toString()));
     }
@@ -113,16 +118,18 @@ class AccountControllerTest {
     @Test
     void getAccountByID_notFound_returns404() throws Exception {
         UUID id = UUID.randomUUID();
-        Mockito.when(accountService.getAccountById(id)).thenReturn(Optional.empty());
+        // CORREÇÃO: Mudar o método mockado de getAccountById para findById
+        Mockito.when(accountService.findById(id)).thenReturn(Optional.empty());
 
-        mockMvc.perform(get("/accounts/"))
+        // CORREÇÃO: Testar o path correto /accounts/{id}
+        // E como o Controller agora lança ResponseStatusException para 404, precisamos capturá-la.
+        mockMvc.perform(get("/accounts/" + id)) // Testar o path correto
                 .andExpect(status().isNotFound());
     }
 
     @Test
     void createAccount_returnsCreated() throws Exception {
 
-        // Mockando um ID de cliente, se necessário
         AccountDTO requestDto = AccountDTO.builder()
                 .accountNumber("67890")
                 .agency("002")
@@ -158,7 +165,7 @@ class AccountControllerTest {
                 .balance(new BigDecimal("100.50"))
                 .accountType(AccountType.POUPANCA)
                 .accountStatus(AccountStatus.ATIVA)
-                .customerId(createMockCustomer(generatedId).getId())
+                .customerId(createMockCustomer(generatedId).getId()) // Note: customerId aqui é para o DTO de resposta, deve ser o mesmo do request
                 .build();
 
         Mockito.when(accountMapper.toEntity(any(AccountDTO.class))).thenReturn(accountEntityToCreate);
@@ -178,3 +185,4 @@ class AccountControllerTest {
                 .andExpect(jsonPath("$.accountStatus").value(AccountStatus.ATIVA.toString()));
     }
 }
+
