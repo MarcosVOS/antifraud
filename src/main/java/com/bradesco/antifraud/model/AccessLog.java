@@ -26,7 +26,7 @@ public class AccessLog {
     private LocalDateTime timestamp;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "customers_id", nullable = false)
+    @JoinColumn(name = "customer_id", nullable = false)
     @NotNull(message = "Customer is required")
     private Customer customer;
 
