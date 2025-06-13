@@ -1,7 +1,5 @@
 package com.bradesco.antifraud.model;
 
-
-
 import jakarta.persistence.*;
 
 import jakarta.validation.constraints.NotNull;
@@ -43,10 +41,15 @@ public class Account {
     @Enumerated(EnumType.STRING)
     private AccountStatus accountStatus;
 
-    @ManyToOne(fetch =  FetchType.LAZY)
-    @JoinColumn(name = "customers_id", nullable = false)
-    Customer customer;
+    @ManyToOne
+    @JoinColumn(name = "customer_id", nullable = false)
+    private Customer customer;
 
-    public enum AccountType {CORRENTE,POUPANCA,INVESTIMENTO}
-    public enum AccountStatus {ATIVA,INATIVA, BLOQUADA,ENCERRADA}
+    public enum AccountType {
+        CORRENTE, POUPANCA, INVESTIMENTO
+    }
+
+    public enum AccountStatus {
+        ATIVA, INATIVA, BLOQUADA, ENCERRADA
+    }
 }

@@ -93,6 +93,37 @@ public class AccountService {
         return accountRepository.save(existingAccount);
     }
 
+    public Account updateAccount(UUID id, Account updatedAccountData) {
+        Account existingAccount = accountRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Account with ID " + id + " does not exist."));
+
+
+        // Verificar se o accountNumber está sendo alterado para um já existente (excluindo o próprio)
+        Optional<Account> accountByNewNumber = accountRepository.findByAccountNumber(updatedAccountData.getAccountNumber());
+        if (accountByNewNumber.isPresent() && !accountByNewNumber.get().getId().equals(id)) {
+            throw new AccountAlreadyExistsException("Account with number " + updatedAccountData.getAccountNumber() + " already exists.");
+        }
+
+
+
+        if (updatedAccountData.getAgency() != null) {
+            existingAccount.setAgency(updatedAccountData.getAgency());
+        }
+        if (updatedAccountData.getBalance() != null) {
+            existingAccount.setBalance(updatedAccountData.getBalance());
+        }
+        if (updatedAccountData.getAccountType() != null) {
+            existingAccount.setAccountType(updatedAccountData.getAccountType());
+        }
+        if (updatedAccountData.getAccountStatus() != null) {
+            existingAccount.setAccountStatus(updatedAccountData.getAccountStatus());
+        }
+
+
+        return accountRepository.save(existingAccount);
+    }
+
+
     public boolean accountExists(UUID id) {
         return accountRepository.existsById(id);
     }
