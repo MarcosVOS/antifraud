@@ -31,8 +31,8 @@ Accept: application/json
 
 {
   "name": "Lucas da Silva",
-  "cpf": "390.533.447-05",
-  "email": "marcos.oliveiradev@gmail.com",
+  "cpf": "316.031.160-01",
+  "email": "heitor@gmail.com",
   "phone": "11999999999",
   "dateOfBirth": "1990-01-01",
   "address": {

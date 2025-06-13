@@ -1,7 +1,7 @@
 # =============================
 # Buscar conta por ID
 # =============================
-GET http://localhost:8080/accounts/{id}
+GET http://localhost:8080/accounts/0fb3dea1-a413-461b-ba64-bb5b28ebfbca
 Accept: application/json
 
 ### Exemplo de resposta: 200 OK
@@ -23,12 +23,12 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "numeroConta": "123456",
-  "agencia": "0001",
-  "saldo": 1000.00,
-  "tipoConta": "CORRENTE",
-  "status": "ATIVA",
-  "customerId": "uuid-do-usuario"
+  "account_number": "722",
+  "agency": "723",
+  "balance": 0,
+  "account_type": "CORRENTE",
+  "account_status": "ATIVA",
+  "customerId": "a3703c00-8b55-401a-a8ac-6aff04267102"
 }
 
 ### Exemplo de resposta: 201 Created
@@ -45,17 +45,17 @@ Accept: application/json
 # =============================
 # Atualizar conta por ID
 # =============================
-PUT http://localhost:8080/accounts/updateAccount/{id}
+PUT http://localhost:8080/accounts/updateAccount/0fb3dea1-a413-461b-ba64-bb5b28ebfbca
 Content-Type: application/json
 Accept: application/json
 
 {
-  "numeroConta": "123456",
-  "agencia": "0001",
-  "saldo": 1500.00,
-  "tipoConta": "POUPANCA",
-  "status": "ATIVA",
-  "customerId": "uuid-do-usuario"
+  "account_number": "722",
+  "agency": "723",
+  "balance": 1520.00,
+  "account_type": "CORRENTE",
+  "account_status": "ATIVA",
+  "customerId": "a3703c00-8b55-401a-a8ac-6aff04267102"
 }
 
 ### Exemplo de resposta: 200 OK
@@ -72,35 +72,5 @@ Accept: application/json
 # =============================
 # Deletar conta por ID
 # =============================
-DELETE http://localhost:8080/accounts/deleteAccount/{id}
+DELETE http://localhost:8080/accounts/deleteAccount/0fb3dea1-a413-461b-ba64-bb5b28ebfbca
 Accept: application/json
-
-### Exemplo de resposta: 204 No Content
-
-# =============================
-# Listar todas as contas
-# =============================
-GET http://localhost:8080/accounts
-Accept: application/json
-
-### Exemplo de resposta: 200 OK
-# [
-#   {
-#     "id": "uuid-da-conta1",
-#     "numeroConta": "123456",
-#     "agencia": "0001",
-#     "saldo": 1000.00,
-#     "tipoConta": "CORRENTE",
-#     "status": "ATIVA",
-#     "customerId": "uuid-do-usuario1"
-#   },
-#   {
-#     "id": "uuid-da-conta2",
-#     "numeroConta": "654321",
-#     "agencia": "0002",
-#     "saldo": 500.00,
-#     "tipoConta": "POUPANCA",
-#     "status": "INATIVA",
-#     "customerId": "uuid-do-usuario2"
-#   }
-# ]
