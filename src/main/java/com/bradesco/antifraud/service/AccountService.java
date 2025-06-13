@@ -74,8 +74,6 @@ public class AccountService {
             throw new AccountAlreadyExistsException("Account with number " + updatedAccountData.getAccountNumber() + " already exists.");
         }
 
-
-
         if (updatedAccountData.getAgency() != null) {
         existingAccount.setAgency(updatedAccountData.getAgency());
     }
