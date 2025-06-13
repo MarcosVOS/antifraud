@@ -23,12 +23,12 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "numeroConta": "123456",
-  "agencia": "0001",
-  "saldo": 1000.00,
-  "tipoConta": "CORRENTE",
-  "status": "ATIVA",
-  "customerId": "uuid-do-usuario"
+  "account_number": "721",
+  "agency": "722",
+  "balance": 0,
+  "account_type": "CORRENTE",
+  "account_status": "ATIVA",
+  "customerId": "a3703c00-8b55-401a-a8ac-6aff04267102"
 }
 
 ### Exemplo de resposta: 201 Created
@@ -55,7 +55,7 @@ Accept: application/json
   "saldo": 1500.00,
   "tipoConta": "POUPANCA",
   "status": "ATIVA",
-  "customerId": "uuid-do-usuario"
+  "customerId": "a3703c00-8b55-401a-a8ac-6aff04267102"
 }
 
 ### Exemplo de resposta: 200 OK
